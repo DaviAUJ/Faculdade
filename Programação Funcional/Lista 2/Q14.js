@@ -1,19 +1,20 @@
-function nomearAlgarismo(num) {
-    const nomes = {
-        1: "Um",
-        2: "Dois",
-        3: "Três",
-        4: "Quatro",
-        5: "Cinco",
-        6: "Seis",
-        7: "Sete",
-        8: "Oito",
-        9: "Nove",
-        0: "Zero"
-    }
+const nomearAlgarismo = (num) => {
+    const nomes = [
+        "Um",
+        "Dois",
+        "Três",
+        "Quatro",
+        "Cinco",
+        "Seis",
+        "Sete",
+        "Oito",
+        "Nove",
+        "Zero"
+    ]
 
+    // Verificação se o input é válido
     if(num > 9 || num < 0) { return "Error" }
-    else { return nomes[num] }
+    else { return nomes[num - 1] }
 }
 
-console.log(nomearAlgarismo(-9))
+console.log(nomearAlgarismo(5))

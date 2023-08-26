@@ -26,4 +26,16 @@ const range = (start, end, step = 1) => {
     return Array.from(Array(length), (x, index) => start + index * step)
 }
 
-module.exports = { print, listSum, divisaoInteira, range }
+const inverte = (string, acc=0) => {
+  if(acc === string.length) { return '' }
+
+  return inverte(string, acc + 1) + string[acc]
+}
+
+const unirLista = (lista, acc=0) => {
+  if(acc === lista.length - 1) { return lista[lista.length - 1] }
+
+  return lista[acc] + unirLista(lista, acc + 1)
+}
+
+module.exports = { print, listSum, divisaoInteira, range, inverte, unirLista }

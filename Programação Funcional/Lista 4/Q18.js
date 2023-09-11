@@ -6,6 +6,7 @@ const unirLista = (lista, acc=0) => {
     return lista[acc] + unirLista(lista, acc + 1)
 }
 
+// Esta função está com o funcionamento incorreto, ela deveria substituir as vogais com acento pelas sem acento mas ele apenas apaga-as
 const filtroString = (string) => {
     const output = [...string].filter(
         function suporte(item, index, array, acc=0) {

@@ -38,4 +38,6 @@ const unirLista = (lista, acc=0) => {
   return lista[acc] + unirLista(lista, acc + 1)
 }
 
-module.exports = { print, listSum, divisaoInteira, range, inverte, unirLista }
+const isUndef = (x) => typeof x === "undefined"
+
+module.exports = { print, listSum, divisaoInteira, range, inverte, unirLista, isUndef }

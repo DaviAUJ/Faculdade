@@ -1,5 +1,11 @@
 #include <stdio.h>
 
+// Escrever um programa em C sobre investimento. Deve ser efetuada a
+// leitura do valor inicial investido, do valor investido mensalmente e do tempo
+// de investimento (desconsiderar juros) e retornar o valor final (montante) e o
+// valor do rendimento (montante – valor inicial investido). Deve ser aplicado
+// um módulo(função) com dois parâmetros de saída.
+
 double investimento(double vInicial, double vMensal, double tempo, double* saida1, double* saida2) {
     *saida1 = vInicial + vMensal * tempo; // dinheiro total
     *saida2 = vMensal * tempo; // Dinheiro apenas do investimento

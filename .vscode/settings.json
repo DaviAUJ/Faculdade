@@ -3,6 +3,9 @@
         "iostream": "cpp",
         "iomanip": "cpp",
         "ostream": "cpp",
-        "e05.C": "cpp"
+        "e05.C": "cpp",
+        "numbers": "c",
+        "ratio": "c",
+        "random": "c"
     }
 }

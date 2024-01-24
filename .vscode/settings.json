@@ -6,6 +6,7 @@
         "e05.C": "cpp",
         "numbers": "c",
         "ratio": "c",
-        "random": "c"
+        "random": "c",
+        "stdio.h": "c"
     }
 }

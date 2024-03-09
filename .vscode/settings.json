@@ -7,6 +7,7 @@
         "numbers": "c",
         "ratio": "c",
         "random": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "E02.C": "cpp"
     }
 }

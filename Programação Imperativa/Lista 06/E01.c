@@ -16,4 +16,6 @@ int main() {
     }
 
     printf("A palavra %s toda maiuscula e: %s", palavraMin, palavraMai);
+
+    return 0;
 }

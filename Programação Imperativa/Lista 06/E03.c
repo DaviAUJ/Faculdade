@@ -20,23 +20,22 @@ int contVogais(char* str) {
 }
 
 int main() {
-    printf("Para encerrar digite 0 e aperte enter\n\n");
-
-    char palavra[21] = "";
-    int vogais, operacao = 0;
+    char palavra[21] = "", continuar = 's';
+    int vogais, operacao = 1;
     
-    while(1) {
-        printf("\nOperacao numero %d\n", operacao);
+    while(continuar == 's') {
+        printf("\n\nOperacao numero %d\n", operacao);
         printf("Digite uma palavra(max 20 caracteres): ");
         scanf("%s", palavra);
-
-        if(palavra[0] == '0') { break; }
 
         vogais = contVogais(palavra);
 
         printf("\nA quantidade de vogais em %s e igual a %d\n\n", palavra, vogais);
 
         operacao++;
+
+        printf("Deseja continuar?(s/n) ");
+        scanf(" %c", &continuar);
     }
 
     printf("\nPrograma encerrado");

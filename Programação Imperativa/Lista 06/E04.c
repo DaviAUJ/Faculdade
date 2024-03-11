@@ -34,22 +34,21 @@ char* upperstr(char* str) {
 }
 
 int main() {
-    printf("\nDigite '0 0' para sair do programa\n");
+    char nome[21] = "", sobrenome[31] = "", continuar = 's';
+    int operacao = 1;
 
-    char nome[21] = "", sobrenome[31] = "";
-    int cont = 1;
-
-    while(1) {
-        printf("\nOperacao numero %d", cont);
+    while(continuar == 's') {
+        printf("\nOperacao numero %d", operacao);
         printf("\nDigite um nome completo(20 chars para o nome, 30 chars para o sobrenome): ");
         scanf("%s ", nome); // pega o primeiro nome
         gets(sobrenome); // pega o resto
 
-        if(nome[0] == '0' && sobrenome[0] == '0') { break; }
-
         printf("\nEste nome quando estilizado se torna: %s, %s\n\n", upperstr(sobrenome), capitalizar(nome));
 
-        cont++;
+        operacao++;
+
+        printf("Deseja continuar?(s/n) ");
+        scanf("%c", &continuar);
     }
 
     printf("\nPrograma encerrado");

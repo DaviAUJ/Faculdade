@@ -14,10 +14,13 @@ int compararStr(char* str1, char* str2) {
 }
 
 int contAlunosGeron(char* ano) {
-    unsigned short int cont = 0;
-    char anoAluno[5] = "", cursoAluno[3] = "", matricula[11];
+    const int N_ALUNOS = 100;
+    const char COD_GERON[3] = "99";
 
-    for(int aluno = 1; aluno <= 100; aluno++){
+    unsigned short int cont = 0;
+    char anoAluno[5] = "", cursoAluno[3] = "", matricula[11] = "";
+
+    for(int aluno = 1; aluno <= N_ALUNOS; aluno++){
         printf("Digite a matricula do aluno #%d: ", aluno);
         scanf(" %s", matricula);
 
@@ -31,14 +34,15 @@ int contAlunosGeron(char* ano) {
         cursoAluno[0] = matricula[4];
         cursoAluno[1] = matricula[5];
 
-        if(compararStr(anoAluno, ano) && compararStr(cursoAluno, "99")) { cont++; }
+        // é necessário usar (char*) pq se não ele da problema com o const por algum motivo
+        if(compararStr(anoAluno, ano) && compararStr(cursoAluno, (char*)COD_GERON)) { cont++; } 
     }
 
     return cont;
 }
 
 int main() {
-    char ano[5];
+    char ano[5] = "";
     unsigned short int contAlunos;
 
     printf("Digite o ano alvo: ");

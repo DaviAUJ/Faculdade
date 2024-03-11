@@ -22,9 +22,9 @@ char* capitalizar(char* str) {
 }
 
 int main() {
-    char nome[41];
+    char nome[41] = "";
 
-    printf("Digite um nome: ");
+    printf("Digite um nome(max 40 caracteres): ");
     gets(nome);
 
     printf("O nome inserido quando capitalizado vira: %s", capitalizar(nome));

@@ -27,7 +27,7 @@ int main() {
     
     while(1) {
         printf("\nOperacao numero %d\n", operacao);
-        printf("Digite uma palavra: ");
+        printf("Digite uma palavra(max 20 caracteres): ");
         scanf("%s", palavra);
 
         if(palavra[0] == '0') { break; }

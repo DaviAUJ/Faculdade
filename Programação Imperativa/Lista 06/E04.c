@@ -36,12 +36,12 @@ char* upperstr(char* str) {
 int main() {
     printf("\nDigite '0 0' para sair do programa\n");
 
-    char nome[21], sobrenome[31];
-    int cont = 0;
+    char nome[21] = "", sobrenome[31] = "";
+    int cont = 1;
 
     while(1) {
         printf("\nOperacao numero %d", cont);
-        printf("\nDigite um nome completo: ");
+        printf("\nDigite um nome completo(20 chars para o nome, 30 chars para o sobrenome): ");
         scanf("%s ", nome); // pega o primeiro nome
         gets(sobrenome); // pega o resto
 

@@ -29,8 +29,9 @@ int compararStr(char* str1, char* str2) {
     return 1;
 }
 
-char Estaciona[30][14]; //30 vagas e mantem placa com 7 caracteres, sinal de + e 5 caracteres para hora
-float Valor;
+char Estaciona[31][14]; //30 vagas e mantem placa com 7 caracteres, sinal de + e 5 caracteres para hora
+int qCarrosHora[14], hMovimentada;
+float Valor, ganhos = 0;
 char Responsavel[21] = "", Iniciou = 0;
 
 void AbrirCaixa() {
@@ -56,7 +57,10 @@ void AbrirCaixa() {
 
 void ClienteChega() {
     int Vaga;
-    char Placa[8] = "", Hora[5] = "", Entrada[14] = "";
+    char Placa[8] = "", horario[6] = "", Entrada[14] = "";
+
+    // Variáveis exercício 3
+    int hora;
 
     system("cls");
     system("color 80"); // 8 - cinza  0 - preto
@@ -69,26 +73,37 @@ void ClienteChega() {
         printf("\n CAIXA ABERTO   Valor/h: %.2f", Valor);
         printf("\n Responsavel: %s\n\n", Responsavel);
 
-        printf("Qual a vaga ocupada? ");
-        scanf("%d", &Vaga);
-
         fflush(stdin);
 
-        printf("Qual a placa do veiculo [7 digitos]? ");
-        gets(Placa);
-        strcpy(Entrada, Placa);
+        printf("Qual a horario de entrada [formato hh:mm]? ");
+        gets(horario);
 
-        fflush(stdin);
+        // Exercício 3 & 4
+        hora = 10 * (horario[0] - '0') + (horario[1] - '0');
 
-        printf("Qual a hora de entrada [formato nn:nn]? ");
-        gets(Hora);
+        if(hora >= 6 && hora < 20) {
+            printf("Qual a vaga ocupada? ");
+            scanf("%d", &Vaga);
 
-        strcat(Entrada, "+");
-        strcat(Entrada, Hora);
-        strcpy(Estaciona[Vaga-1], Entrada);
+            fflush(stdin);
 
-        printf("Chegada registrada com sucesso!\n");
+            printf("Qual a placa do veiculo [7 digitos]? ");
+            gets(Placa);
+            strcpy(Entrada, Placa);
 
+            printf("Chegada registrada com sucesso!\n\n");
+
+            // -6 para mudar o index para o primeiro
+            qCarrosHora[hora - 6]++;
+            strcat(Entrada, "+");
+            strcat(Entrada, horario);
+            strcpy(Estaciona[Vaga-1], Entrada);
+
+        } else {
+            printf("No momento o estaciomento esta fechado\n\n");
+
+        }
+        
     } else { printf("\nERRO: Antes eh preciso abrir o caixa!\n"); }
     
     system("pause");
@@ -167,31 +182,75 @@ void ClienteSai() {
 
                 preco += (deltaTempo / 15) * (Valor / 6);
 
+                // Exercício 5
+                ganhos += preco;
+
                 printf("Preco do estacionamento: R$%.2f\n\n", preco);
+
+                printf("\nValor pago pelo cliente: R$");
+                scanf("%f", &valorPago);
+
+
+                if(valorPago == preco) {
+                    printf("\nPagamento efetuado - Nao e necessario troco\n\n");
+
+                } else {
+                    printf("\nPagamento efetuado - troco: R$%.2f\n\n", valorPago - preco);
+                    
+                }
             }
 
             // retira o cliente da vaga
             strcpy(Estaciona[Vaga - 1], "LIVRE");
-
-            printf("\nValor pago pelo cliente: R$");
-            scanf("%f", valorPago);
-
-            if(valorPago == preco) {
-                printf("\nPagamento efetuado - Nao e necessario troco");
-            } else {
-                printf("\nPagamento efetuado - troco: %f", valorPago - preco);
-            }
         }
+
     } else { printf("\nERRO: Antes eh preciso abrir o caixa!\n"); }
         
     system("pause");
 }
 
-void FecharCaixa() {  }
+int Op;
+
+void FecharCaixa() {
+    // Exercício 3
+    int podeFechar = 1, horario;
+
+    system("cls");
+    system("color 70"); // 8 - cinza  0 - preto
+
+    // Verifica se pode fecahr
+    for(int cont = 0; cont < 30; cont++) {
+        // Se for diferente de "LIVRE"
+        if(!compararStr(Estaciona[cont], "LIVRE")) {
+            podeFechar = 0;
+            
+            printf(" Ha um carro na vaga #%d\n", cont + 1);
+        }
+    }
+
+    if(podeFechar) {
+        for(int cont = 0; cont < 14; cont++) {
+            horario = cont + 6;
+
+            printf(" %d:00 - %d\n", horario, qCarrosHora[cont]);
+
+            // Exercício 5
+            if(cont == 0 || qCarrosHora[cont] > qCarrosHora[hMovimentada - 6]) { hMovimentada = horario; }
+        }
+
+        printf("Ganhos do dia: R$%.2f\n", ganhos);
+        printf("Horario mais movimentado: %d:00\n", hMovimentada);
+        printf("\n O caixa foi fechado\n\n");
+        Op = 5;
+
+    } else { 
+        printf("\n O caixa nao pode ser fechado\n\n"); 
+
+        system("pause");
+    }
+}
 
 int main(){
-    int Op;
-
     do {
         system("cls");
         system("color 70"); // 7 - branco  0 - preto
@@ -202,6 +261,7 @@ int main(){
         printf("\n 2 - Chegada de Cliente");
         printf("\n 3 - Saida de Cliente");
         printf("\n 4 - Fechar Caixa");
+        // 5 - Se tudo ocorrer bem com a saída a opção 4 muda Op para 5 para pode finalizar
         printf("\n\n Qual a opcao desejada? ");
 
         do {
@@ -228,7 +288,7 @@ int main(){
             case 4: FecharCaixa();
                 break;
         }
-    } while(Op != 4);
+    } while(Op != 5);
         
     return 0;
 }

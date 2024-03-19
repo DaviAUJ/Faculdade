@@ -14,7 +14,7 @@ int compararStr(char* str1, char* str2) {
 }
 
 int contAlunosGeron(char* ano) {
-    const int N_ALUNOS = 100;
+    const int N_ALUNOS = 3;
     const char COD_GERON[3] = "99";
 
     unsigned short int cont = 0;

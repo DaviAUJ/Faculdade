@@ -5,52 +5,27 @@
 // eu preciso usar esse método
 // Isso acontece por algo muito técnico que ainda não entendo muito bem
 #define N_MARCAS 6
-#define N_ATRIBUTOS 4
 int Frz = -1, Crc = -1;
 
-float M[N_ATRIBUTOS][N_MARCAS] = {
-    {385, 534, 309, 546, 503, 477},
-    {12, 12, 12, 3, 24, 12},
-    {35.9, 72.1, 46.2, 74.3, 78, 90},
-    {-28, -18, -18, -18, -22, -18}
+typedef struct freezer {
+    char nome[21];
+    float capacidade;
+    int garantia;
+    float gasto;
+    float temperaturaMinima;
+} freezer;
+
+freezer listaFreezers[N_MARCAS] = {
+    // Marca, Capacidade, Duração da garantia, Gasto de energia, Temperatura minima
+    {"Deia", 385, 12, 35.9, -28},
+    {"Sul", 534, 12, 72.1, -18},
+    {"Nsul", 309, 12, 46.2, -18},
+    {"Frio", 546, 3, 74.3, -18},
+    {"Fri", 503, 24, 78, -22},
+    {"Lux", 477, 12, 90, -18},
 };
 
-
-void ExibeMatriz(float Matriz[N_ATRIBUTOS][N_MARCAS], int L, int C) {
-    printf("                      Deia   Sul  NSul  Frio   Fri   Lux \n");
-
-    for(int i = 0; i < L; i++) {
-        if(i == 0) printf("Capacidade (litros) ");
-        if(i == 1) printf("Garantia (meses)    ");
-        if(i == 2) printf("Economia (KWh/mes)  ");
-        if(i == 3) printf("Temperatura Min (C) "); 
-
-        for(int j = 0; j < C; j++) { printf("%6.1f", Matriz[i][j]); }
-
-        printf("\n");
-    }
-}
-
-void ExibeColuna(float Matriz[N_ATRIBUTOS][N_MARCAS], int L, int C) {
-    for(int i = 0; i < L; i++){
-        if(i == 0) printf("\nCapacidade (litros) ");
-        if(i == 1) printf("Garantia (meses)    ");
-        if(i == 2) printf("Economia (KWh/mes)  ");
-        if(i == 3) printf("Temperatura Min (C) ");
-
-        printf("%6.1f\n", Matriz[i][C]);
-    }
-}
-
-void ExibeLinha(float Matriz[N_ATRIBUTOS][N_MARCAS], int L, int C) {
-    printf("\nDeia   Sul  NSul  Frio   Fri   Lux \n");
-
-    for(int i = 0; i < C; i++) { printf("%.1f ", Matriz[L][i]); }
-
-    printf("\n");
-}
-
-void SelecionaFreezer(float Matriz[N_ATRIBUTOS][N_MARCAS], int* F) {
+void SelecionaFreezer(freezer* lista, int* F) {
     int Op;
 
     printf("Selecione o freezer desejado:\n");
@@ -67,7 +42,7 @@ void SelecionaFreezer(float Matriz[N_ATRIBUTOS][N_MARCAS], int* F) {
     *F = Op - 1;
 }
 
-void SelecionaCaracteristica(float Matriz[N_ATRIBUTOS][N_MARCAS], int* C) {
+void SelecionaCaracteristica(freezer* lista, int* C) {
     int Op;
 
     printf("Caracteristica desejado\n");
@@ -82,7 +57,7 @@ void SelecionaCaracteristica(float Matriz[N_ATRIBUTOS][N_MARCAS], int* C) {
     *C = Op - 1;
 }
 
-void alterarMatrizFloat(float matriz[N_ATRIBUTOS][N_MARCAS], int linha, int coluna, float novoValor) {
+void alterarDado(freezer* lista, int linha, int coluna, float novoValor) {
     // linha de cima para baixo, 0 até x
     // Coluna esquerda para direita 0 até y
     // x e y são a quantidade de linhas e colunas, respectivamente
@@ -94,65 +69,6 @@ void alterarMatrizFloat(float matriz[N_ATRIBUTOS][N_MARCAS], int linha, int colu
 
         printf("Valor alterado com sucesso\n");
     }
-}
-
-// Retorna o index do maior valor do vetor
-int maiorValorVetorFloatIndex(float* vetor, int tamanho) {
-    float temp = vetor[0];
-    int output;
-
-    for(int i = 1; i < tamanho; i++) {
-        if(temp < vetor[i]) { output = i; }
-    }
-
-    return output;
-}
-
-// Retorna o index do menor valor do vetor
-int menorValorVetorFloatIndex(float* vetor, int tamanho) {
-    float temp = vetor[0];
-    int output;
-
-    for(int i = 1; i < tamanho; i++) {
-        if(temp > vetor[i]) { output = i; }
-    }
-
-    return output;
-}
-
-void melhorFreezer(float matriz[N_ATRIBUTOS][N_MARCAS], int indexAtributo) {
-    int index;
-
-    // Caso seja o vetor do gasto de energia mensal ou temperatura ele precisa achar o menor valor
-    if(indexAtributo == 2 || indexAtributo == 3) { index = menorValorVetorFloatIndex(matriz[indexAtributo], N_MARCAS); } 
-    else { index = maiorValorVetorFloatIndex(matriz[indexAtributo], N_MARCAS); }
-
-    // Montando a frase para ser exibida
-    printf("O freezer da marca ");
-    switch(index) {
-        case 0: printf("Deia"); break;
-
-        case 1: printf("Sul"); break;
-
-        case 2: printf("NSul"); break;
-
-        case 3: printf("Frio"); break;
-
-        case 4: printf("Fri"); break;
-
-        case 5: printf("Lux"); break;
-    }
-    printf(" tem a ");
-    switch(indexAtributo) {
-        case 0: printf("maior capacidade(%.2f L)", matriz[indexAtributo][index]); break;
-
-        case 1: printf("garantia mais longa(%.0f meses)", matriz[indexAtributo][index]); break;
-
-        case 2: printf("melhor eficiencia(%.2f KWh/mes)", matriz[indexAtributo][index]); break;
-
-        case 3: printf("menor temperatura minima(%.2f C)", matriz[indexAtributo][index]); break;
-    }
-    printf("\n\n");
 }
               
 int main() {

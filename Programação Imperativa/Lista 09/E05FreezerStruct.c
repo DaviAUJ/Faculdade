@@ -5,7 +5,7 @@
 // eu preciso usar esse método
 // Isso acontece por algo muito técnico que ainda não entendo muito bem
 #define N_MARCAS 6
-int Frz = -1, Crc = -1;
+#define N_ATRIBUTOS 4
 
 typedef struct freezer {
     char nome[21];
@@ -25,120 +25,21 @@ freezer listaFreezers[N_MARCAS] = {
     {"Lux", 477, 12, 90, -18},
 };
 
-void SelecionaFreezer(freezer* lista, int* F) {
-    int Op;
-
-    printf("Selecione o freezer desejado:\n");
-    printf("\n1 - Deia\n");
-    printf("2 - Sul\n");
-    printf("3 - NSul\n");
-    printf("4 - Frio\n");
-    printf("5 - Fri\n");
-    printf("6 - Lux\n\n");
-
-    printf("Opcao: ");
-    scanf("%d", &Op);
-
-    *F = Op - 1;
-}
-
-void SelecionaCaracteristica(freezer* lista, int* C) {
-    int Op;
-
-    printf("Caracteristica desejado\n");
-    printf("\n1 - Capacidade (litros)\n");
-    printf("2 - Garantia (meses)\n");
-    printf("3 - Economia(kWh/mes)\n");
-    printf("4 - Temperatura Minima (Celsius)\n");
-    printf("\nOpcao: ");
-    
-    scanf("%d", &Op);
-
-    *C = Op - 1;
-}
-
-void alterarDado(freezer* lista, int linha, int coluna, float novoValor) {
+void alterarDado(freezer* lista, int nFreezer, int nCarac, float novoValor) {
     // linha de cima para baixo, 0 até x
     // Coluna esquerda para direita 0 até y
     // x e y são a quantidade de linhas e colunas, respectivamente
 
-    if(linha > N_ATRIBUTOS || linha < 0) { printf("Atributo nao existente!\n"); }
-    else if(coluna > N_MARCAS || coluna < 0) { printf("Marca nao existente!\n"); }
+    if(nFreezer > N_ATRIBUTOS || nFreezer < 0) { printf("Atributo nao existente!\n"); }
+    else if(nCarac > N_MARCAS || nCarac < 0) { printf("Marca nao existente!\n"); }
     else {
-        matriz[linha][coluna] = novoValor;
+        switch(nCarac) {
+            case 0: lista[nFreezer].capacidade = novoValor; break;
+            case 1: lista[nFreezer].garantia = novoValor; break;
+            case 2: lista[nFreezer].gasto = novoValor; break;
+            case 3: lista[nFreezer].temperaturaMinima = novoValor; break;
+        }
 
         printf("Valor alterado com sucesso\n");
     }
-}
-              
-int main() {
-    while(1) {
-        int Op;
-        float aux;
-
-        system("cls");
-
-        printf(">>> Pesquisa Freezer <<<\n\n");
-        printf("Selecione a opcao desejada:\n");
-        printf("1 - Exibir Levantamento\n");
-        printf("2 - Dados de um Freezer\n");
-        printf("3 - Dados de uma Caracteristica\n");
-        printf("4 - Alterar Dado\n");
-        printf("5 - Melhor Freezer em Capacidade\n");
-        printf("6 - Melhor Freezer em Garantia\n");
-        printf("7 - Melhor Freezer em Economia\n");
-        printf("8 - Melhor Freezer em Temperatura\n");
-        printf("9 - Sair\n");
-
-        printf("\nOpcao: ");
-        scanf("%d", &Op);
-
-        system("cls");
-        
-        switch(Op) {
-            case 1: ExibeMatriz(M, 4, 6);
-                    break;
-
-            case 2: SelecionaFreezer(M, &Frz);
-                    ExibeColuna(M, 4, Frz);
-                    break;
-
-            case 3: SelecionaCaracteristica(M, &Crc);
-                    ExibeLinha(M, Crc, 6);
-                    break;
-
-            case 4: SelecionaCaracteristica(M, &Crc);
-                    printf("\n");
-                    SelecionaFreezer(M, &Frz);
-                    printf("\n");
-            
-                    printf("Novo valor: ");
-                    scanf("%f", &aux);
-
-                    alterarMatrizFloat(M, Crc, Frz, aux);
-                    break; 
-
-            case 5: melhorFreezer(M, 0); // Melhor freezer em capacidade
-                    break;
-
-            case 6: melhorFreezer(M, 1); // Melhor freezer em garantia
-                    break;
-
-            case 7: melhorFreezer(M, 2); // Melhor freezer em economia
-                    break;
-
-            case 8: melhorFreezer(M, 3); // Melhor freezer em temperatura
-                    break;
-
-            case 9: break;
-        }
-
-        if(Op == 9) { break; }
-        else {
-            printf("\n");
-            system("pause");
-        }
-    }
-
-    return 0;
 }

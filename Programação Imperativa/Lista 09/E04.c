@@ -23,7 +23,6 @@ int inverter01(int entrada) {
     return entrada;
 }
 
-// Função retirada do Exercício 2
 int compararStringSM(char* str1, char* str2, char operacao) {
     // SM - sem maiuscula - não leva em conta se as letras estão maiusculas ou não
     // operação pode ser >, <, =

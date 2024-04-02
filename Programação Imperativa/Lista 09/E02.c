@@ -79,7 +79,7 @@ int main() {
 
     char listaCompras[6][11] = {"Abacaxi", "Amaciante", "Carne", "Guarana", "Sal", "Tomate"};
 
-    int index = bbinaria("Tomate", 0, 5, listaCompras);
+    int index = bbinaria("carne", 0, 5, listaCompras);
 
     system("cls");
 

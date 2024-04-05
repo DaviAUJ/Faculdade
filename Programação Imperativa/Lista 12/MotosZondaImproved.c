@@ -1,9 +1,3 @@
-// Melhoria 1: Todos os serviços tem uma mensagem para cada status das motos
-// Melhoria 2: Adicionado opcao de retirar o cancelamento de um serviço
-// Melhoria 3: Pode apenas ser inserido placas com seis caracteres
-// Melhoria 4: juntei opção 6 e 7 em uma
-// Melhoria 5: Não pode inserir no sistema uma placa que já está cadastrada
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -13,6 +7,14 @@
 #define tamModelo 10
 #define tamPlaca 6
 #define tamDefeito 50
+
+typedef struct data{
+    unsigned int dia;
+    unsigned int mes;
+    unsigned int ano;
+    float lucro;
+
+} data;
 
 typedef struct RegMoto{
 	char Nome[tamNome + 1];
@@ -26,7 +28,60 @@ typedef struct RegMoto{
 
 TpRegMoto VZonda[50];
 
+char nomeArquivoMotos[tamNome + 1] = "motosPendentes.dat";
+char nomeArquivoFinanceiro[tamNome + 1] = "financeiro.dat";
+FILE* arquivoMotos;
+FILE* arquivoFinanceiro;
+
+unsigned int tamanhoData = 3 * sizeof(unsigned int) + sizeof(float);
+unsigned int tamanhoRegMoto = (tamNome + tamModelo + tamPlaca + tamDefeito + 6) * sizeof(char) + sizeof(float);
+
 int Quant = -1; //Controla o preenchimento do vetor
+
+data dia;
+
+long int TArquivo(FILE* arquivo, unsigned int tamanho) {
+    fseek(arquivo, 0, 2);
+
+	long int R = ftell(arquivo) / tamanho;
+
+	return R;
+}
+
+TpRegMoto pegaUltimoRegistro(FILE* arquivo, unsigned int tamanho) {
+    TpRegMoto output;
+
+    if(TArquivo(arquivo, tamanho) == 0) {
+        strcpy(output.Nome, "INVALIDO");
+        output.Preco = -1;
+
+        return output;
+    }
+
+    // Vai pro final do arquivo
+    fseek(arquivo, -tamanho, 2);
+
+    // Pega o ultimo registro
+    fread(&output, tamanho, 1, arquivo);
+
+    return output;
+}
+
+data pedirData() {
+    data output;
+
+    printf("\nDigite a data de hoje\n");
+    printf("\ndia: ");
+    scanf("%i", &output.dia);
+
+    printf("mes: ");
+    scanf("%i", &output.mes);
+
+    printf("ano: ");
+    scanf("%i", &output.ano);
+
+    return output;
+}   
 
 void SolicitaServico() {
     /* (1) Solicitar Serviço – quando se insere os dados supracitados, e também os campos status com valor zero sinalizando que o serviço ainda não foi feito, preço, também iniciado com zero.  Este deve estar em loop. */
@@ -211,35 +266,62 @@ void ConcluirServico() {
 int Opcao;
 
 void EncerrarExpediente() {
-    int podeEncerrar = 1;
     float soma = 0;
 
+    // Limpa o arquivo para novos registros
+    fclose(arquivoMotos);
+    remove(nomeArquivoMotos);
+    arquivoFinanceiro = fopen(nomeArquivoFinanceiro, "a+b");
+
+    fseek(arquivoMotos, 0, 0);
+
     for(int i = 0; i <= Quant; i++) {
-        if(VZonda[i].Status == '1') { 
-            printf("placa: %s - Servico nao finalizado\n", VZonda[i].Placa); 
-            podeEncerrar = 0;
-        }
-    }
+        if(VZonda[i].Status == '0' || VZonda[i].Status == '1') { fwrite(&VZonda[i], tamanhoRegMoto, 1, arquivoMotos); } 
+        else if(VZonda[i].Status == '3') { 
+            soma += VZonda[i].Preco;
 
-    if(podeEncerrar == 0) { printf("\nConclua os servicos antes de finalizar o dia\n"); }
-
-    if(podeEncerrar == 1) {
-        for(int i = 0; i <= Quant; i++) {
             printf("Servico #%d - %s\n", i + 1, VZonda[i].Nome);
             printf("Placa: %s\n", VZonda[i].Placa);
             printf("Preco: %.2f\n\n", VZonda[i].Preco);
-            
-            if(VZonda[i].Status == '3') { soma += VZonda[i].Preco; }
         }
+    }
 
-        printf("\nTotal ganho hoje: R$%.2f" , soma);
+    printf("\nTotal ganho hoje: R$%.2f" , soma);
 
-        Opcao = 7;
+    // Passando os dados financeiros para seu respectio arquivo
+    dia.lucro = soma;
+
+    fseek(arquivoFinanceiro, 0, 0);
+    fwrite()
+
+    Opcao = 7;
+}
+
+void pegarServPendentes() {
+    if(TArquivo(arquivoMotos, tamanhoRegMoto) != 0) {
+        TpRegMoto temp, ultimo = pegaUltimoRegistro(arquivoMotos, tamanhoRegMoto);
+        unsigned int index = 0;
+
+        fseek(arquivoMotos, 0, 0);
+
+        do {
+            fread(&temp, tamanhoRegMoto, 1, arquivoMotos);
+            VZonda[index] = temp;
+            
+            index++;
+        } while(strcmp(temp.Nome, ultimo.Nome) != 0);
+
+        Quant += index;
     }
 }
 
 int main() {
-    
+    arquivoMotos = fopen(nomeArquivoMotos, "a+b");
+    arquivoFinanceiro = fopen(nomeArquivoFinanceiro, "a+b");
+
+    system("cls");
+    pegarServPendentes();
+    dia = pedirData();
 
     do {
         //Exibicao de menu e leitura da opcao. 

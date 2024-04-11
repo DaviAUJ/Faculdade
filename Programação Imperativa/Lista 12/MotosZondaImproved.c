@@ -12,7 +12,7 @@ typedef struct data{
     unsigned int dia;
     unsigned int mes;
     unsigned int ano;
-    float lucro;
+    float ganhos;
 
 } data;
 
@@ -40,10 +40,10 @@ int Quant = -1; //Controla o preenchimento do vetor
 
 data dia;
 
-long int TArquivo(FILE* arquivo, unsigned int tamanho) {
+long int TArquivo(FILE* arquivo, unsigned int tamanhoCelula) {
     fseek(arquivo, 0, 2);
 
-	long int R = ftell(arquivo) / tamanho;
+	long int R = ftell(arquivo) / tamanhoCelula;
 
 	return R;
 }
@@ -255,12 +255,40 @@ void ConcluirServico() {
 
         VZonda[Pos].Status = '3';
 
-        printf("\nDigite o preco final do servico: ");
+        printf("\nDigite o preco final do servico: R$");
         scanf("%f", &VZonda[Pos].Preco);
     }
     else if(VZonda[Pos].Status == '2') { printf("Este servico esta cancelado\n"); }
     else if(VZonda[Pos].Status == '3') { printf("Este servico ja foi concluido\n"); }
     else { printf("ERRO: status de servico desconhecido - nada sera alterado\n"); }
+}
+
+void historico() {
+    int quant = TArquivo(arquivoFinanceiro, tamanhoData);
+    data seletor, melhorDia;
+
+    // definindo o primeiro item como base de comparação
+    fseek(arquivoFinanceiro, 0, 0);
+    fread(&melhorDia, tamanhoData, 1, arquivoFinanceiro);
+    fseek(arquivoFinanceiro, 0, 0); 
+   
+    printf("\n --------------------- \n\n"); 
+    if(quant != 0) {
+        for(int i = 0; i < quant; i++) {
+            fread(&seletor, tamanhoData, 1, arquivoFinanceiro);
+            
+            // verificação para definir o melhor dia
+            if(melhorDia.ganhos < seletor.ganhos) { melhorDia = seletor; }
+
+            printf("Data: %02d / %02d / %04d\n", seletor.dia, seletor.mes, seletor.ano);
+            printf("Ganhos: R$%.2f", seletor.ganhos);
+            printf("\n\n --------------------- \n\n"); 
+        }
+
+    } else {
+        printf("Nao existe nenhum registro");
+        printf("\n\n --------------------- \n\n"); 
+    }
 }
 
 int Opcao;
@@ -271,7 +299,7 @@ void EncerrarExpediente() {
     // Limpa o arquivo para novos registros
     fclose(arquivoMotos);
     remove(nomeArquivoMotos);
-    arquivoFinanceiro = fopen(nomeArquivoFinanceiro, "a+b");
+    arquivoMotos = fopen(nomeArquivoMotos, "a+b");
 
     fseek(arquivoMotos, 0, 0);
 
@@ -288,13 +316,13 @@ void EncerrarExpediente() {
 
     printf("\nTotal ganho hoje: R$%.2f" , soma);
 
-    // Passando os dados financeiros para seu respectio arquivo
-    dia.lucro = soma;
+    // Passando os dados financeiros para o arquivo
+    dia.ganhos = soma;
 
     fseek(arquivoFinanceiro, 0, 0);
-    fwrite()
+    fwrite(&dia, tamanhoData, 1, arquivoFinanceiro);
 
-    Opcao = 7;
+    Opcao = -1;
 }
 
 void pegarServPendentes() {
@@ -334,7 +362,8 @@ int main() {
         printf("3 - Remover Solicitacao \n");
         printf("4 - Consultar Solicitacoes \n");
         printf("5 - Concluir Servico \n");
-        printf("6 - Encerrar Expediente \n");
+        printf("6 - Historico financeiro \n");
+        printf("7 - Encerrar Expediente \n");
 
         printf("\nDigite a opcao desejada: ");
         scanf("%d", &Opcao);
@@ -347,13 +376,14 @@ int main() {
             case 3: RemoverSolicitacao(); break;
             case 4: ConsultarSolicitacoes(); break;
             case 5: ConcluirServico(); break;
-            case 6: EncerrarExpediente(); break;
+            case 6: historico(); break;
+            case 7: EncerrarExpediente(); break;
         }
 
         printf("\n");
         system("pause");
 
-    } while(Opcao != 7);
+    } while(Opcao != -1);
 
     return 0;
 }

@@ -31,6 +31,8 @@ int adicionarNaFrente(no **primeiro, no **ultimo, int valor) {
         novoNo->dado = valor;
         novoNo->ponteiro = *primeiro;
         *primeiro = novoNo;
+
+        return 1;
     }
 }
 
@@ -52,6 +54,8 @@ int exibirLista(no **primeiro) {
     }
 
     printf(" ]");
+
+    return 1;
 }
 
 int main() {

@@ -108,7 +108,7 @@ int exibeLista(noCabeca *cabeca) {
     if(cabeca->inicio == NULL) { return 0; }
     noAtual = cabeca->inicio;
 
-    printf("Lista encadeada com cabeca: [ ");
+    printf("\nLista encadeada com cabeca: [ ");
     while(1) {
         printf("%d", noAtual->dado);
         noAtual = noAtual->ponteiro;
@@ -119,7 +119,7 @@ int exibeLista(noCabeca *cabeca) {
     }
 
     printf(" ]");
-    printf("\nNumero de elementos: %d", cabeca->quantidade);
+    printf("\nNumero de elementos: %d\n", cabeca->quantidade);
 
     return 1;
 }
@@ -148,6 +148,25 @@ int procurarValor(noCabeca *cabeca, int valor) {
 }
 
 
+int adicionarNoIndex(noCabeca *cabeca, int index, int valor) {
+    no *novoNo, *noPrecedente;
+
+    if(cabeca->inicio == NULL) { return 0; }
+    if(index < 0 || index > cabeca->quantidade - 1) { return 0; } // Index fora do intervalo
+
+    novoNo = (no*) malloc(sizeof(no));
+    if(novoNo == NULL) { return 0; }
+
+    noPrecedente = cabeca->inicio;
+    for(int i = 0; i < index; i++) { noPrecedente = noPrecedente->ponteiro; } // Pegando o nó anterior ao index escolhido
+
+    novoNo->ponteiro = noPrecedente->ponteiro; 
+    novoNo->dado = valor;
+    noPrecedente->ponteiro = novoNo;
+    cabeca->quantidade++;
+}
+
+
 int main() {
     noCabeca cabeca;
     int entrada, resp;
@@ -167,7 +186,6 @@ int main() {
 
         printf("Adicionar outro elemento(S/N)? ");
         scanf(" %c", &entrada);
-        printf("\n");
 
         if(entrada != 83 && entrada != 115) { resp = 0; }
     }
@@ -175,7 +193,10 @@ int main() {
     resp = exibeLista(&cabeca);
     if(!resp) { printf("Lista vazia"); }
 
-    printf("\n%d", NULL == 20);
+    adicionarNoIndex(&cabeca, 1, 15);
+
+    resp = exibeLista(&cabeca);
+    if(!resp) { printf("Lista vazia"); }
 
     return 0;
 }

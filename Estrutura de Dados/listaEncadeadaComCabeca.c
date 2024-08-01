@@ -146,20 +146,20 @@ int destruirLista(noCabeca *cabeca) {
 int exibeLista(noCabeca *cabeca) {
     no *noAtual;
 
-    if(cabeca->inicio == 0) { return 0; }
-    else if(cabeca->inicio == NULL) { printf("[ ]"); }
+    if(cabeca->inicio == NULL) { return 0; }
     noAtual = cabeca->inicio;
 
-    printf("\nLista encadeada com cabeca: [ ");
+    printf("\n[ ");
     while(1) {
         printf("%d", noAtual->dado);
         noAtual = noAtual->ponteiro;
 
-        if(noAtual == NULL) { printf(" ]"); break; } 
+        if(noAtual == NULL) { break; } 
 
         printf(", "); // Esse esquema aqui é só para aparecer bonitinho
     }
 
+    printf(" ]");
     printf("\nNumero de elementos: %d\n", cabeca->quantidade);
     printf("Inicio: %d\n", cabeca->inicio->dado);
     printf("Fim: %d\n", cabeca->fim->dado);

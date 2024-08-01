@@ -13,10 +13,12 @@ typedef struct noCabeca {
 } noCabeca;
 
 
-void inicializa(noCabeca *cabeca) {
+int inicializa(noCabeca *cabeca) {
     cabeca->inicio = NULL;
     cabeca->fim = NULL;
     cabeca->quantidade = 0;
+
+    return 1;
 }
 
 
@@ -144,7 +146,8 @@ int destruirLista(noCabeca *cabeca) {
 int exibeLista(noCabeca *cabeca) {
     no *noAtual;
 
-    if(cabeca->inicio == NULL) { return 0; }
+    if(cabeca->inicio == 0) { return 0; }
+    else if(cabeca->inicio == NULL) { printf("[ ]"); }
     noAtual = cabeca->inicio;
 
     printf("\nLista encadeada com cabeca: [ ");
@@ -152,12 +155,11 @@ int exibeLista(noCabeca *cabeca) {
         printf("%d", noAtual->dado);
         noAtual = noAtual->ponteiro;
 
-        if(noAtual == NULL) { break; } 
+        if(noAtual == NULL) { printf(" ]"); break; } 
 
         printf(", "); // Esse esquema aqui é só para aparecer bonitinho
     }
 
-    printf(" ]");
     printf("\nNumero de elementos: %d\n", cabeca->quantidade);
     printf("Inicio: %d\n", cabeca->inicio->dado);
     printf("Fim: %d\n", cabeca->fim->dado);
@@ -238,35 +240,30 @@ int removerDoIndex(noCabeca *cabeca, int index) {
 
 int main() {
     noCabeca cabeca;
-    int entrada, resp;
+    int entrada, resp, escolha, estaInicializado;
 
-    inicializa(&cabeca);  
-
-    printf("Digite um valor: ");
-    scanf("%d", &entrada);
-
-    resp = criarNoInicial(&cabeca, entrada);
-    if(!resp) { printf("Memoria nao alocada"); }
+    printf("--- LISTA ENCADEADA ---");
     
-    while(resp) {
-        printf("Digite outro valor: ");
-        scanf("%d", &entrada);
-        adicionarNoFim(&cabeca, entrada);
-
-        printf("Adicionar outro elemento(S/N)? ");
-        scanf(" %c", &entrada);
-        printf("\n");
-
-        if(entrada != 83 && entrada != 115) { resp = 0; }
+    printf("\n\n");
+    resp = exibeLista(&cabeca);
+    if(!resp) { 
+        if(estaInicializado) { printf("[ ]" ); }
+        else { printf("Lista nao inicializada"); }
     }
 
-    resp = exibeLista(&cabeca);
-    if(!resp) { printf("Lista vazia"); }
+    printf("\n\n1 - Inicializar lista");
+    printf("\n2 - Adicionar nó");
+    printf("\n3 - Remover nó");
+    printf("\n4 - Apagar lista");
+    printf("\n\nEscolha: ");
+    scanf("%d", escolha);
 
-    removerDoIndex(&cabeca, 5);
-
-    resp = exibeLista(&cabeca);
-    if(!resp) { printf("Lista vazia"); }
+    switch(escolha) {
+    case 1: 
+        printf("hey");
+        estaInicializado = inicializa(&cabeca);
+        break;
+    }
 
     return 0;
 }

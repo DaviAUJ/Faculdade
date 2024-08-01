@@ -22,7 +22,6 @@ void inicializa(noCabeca *cabeca) {
 
 int criarNoInicial(noCabeca *cabeca, int valor) {
     no *noInicial = (no*) malloc(sizeof(no));
-
     if(noInicial == NULL) { return 0; }
 
     noInicial->dado = valor;
@@ -74,6 +73,46 @@ int adicionarNoFim(noCabeca *cabeca, int valor) {
 }
 
 
+int removerDoInicio(noCabeca *cabeca) {
+    no *noApagado = cabeca->inicio;
+
+    if(noApagado == NULL) { return 0; }
+
+    if(noApagado == cabeca->fim) { inicializa(cabeca); } // Caso onde tem apenas um único elemento na lista
+    else {
+        cabeca->inicio = noApagado->ponteiro;
+        cabeca->quantidade--;
+    }
+    
+    free(noApagado);
+
+    return 1;
+}
+
+
+int removerDoFim(noCabeca *cabeca) {
+    no *noApagado = cabeca->fim;
+    no *noPrecedente;
+
+    if(noApagado == NULL) { return 0; }
+
+    if(cabeca->inicio == noApagado) { inicializa(cabeca); } // Caso onde tem um único elemento na lista
+    else {
+        // Achando o nó precedente
+        noPrecedente = cabeca->inicio;
+        while(noPrecedente->ponteiro != noApagado) { noPrecedente = noPrecedente->ponteiro; }
+
+        noPrecedente->ponteiro = NULL;
+        cabeca->fim = noPrecedente;
+        cabeca->quantidade--;
+    }
+    
+    free(noApagado);
+
+    return 1;
+}
+
+
 int destruirLista(noCabeca *cabeca) {
     no *noAtual, *noSeguinte;
 
@@ -120,6 +159,8 @@ int exibeLista(noCabeca *cabeca) {
 
     printf(" ]");
     printf("\nNumero de elementos: %d\n", cabeca->quantidade);
+    printf("Inicio: %d\n", cabeca->inicio->dado);
+    printf("Fim: %d\n", cabeca->fim->dado);
 
     return 1;
 }
@@ -152,18 +193,46 @@ int adicionarNoIndex(noCabeca *cabeca, int index, int valor) {
     no *novoNo, *noPrecedente;
 
     if(cabeca->inicio == NULL) { return 0; }
-    if(index < 0 || index > cabeca->quantidade - 1) { return 0; } // Index fora do intervalo
 
-    novoNo = (no*) malloc(sizeof(no));
-    if(novoNo == NULL) { return 0; }
+    // Caso o index dado não seja no meio da lista o novo nó vai para o inicio ou fim
+    if(index <= 0) { adicionarNoInicio(cabeca, valor); }
+    else if(index >= cabeca->quantidade - 1) { adicionarNoFim(cabeca, valor); }
+    else {
+        novoNo = (no*) malloc(sizeof(no));
+        if(novoNo == NULL) { return 0; }
 
-    noPrecedente = cabeca->inicio;
-    for(int i = 0; i < index; i++) { noPrecedente = noPrecedente->ponteiro; } // Pegando o nó anterior ao index escolhido
+        noPrecedente = cabeca->inicio;
+        for(int i = 0; i < index - 1; i++) { noPrecedente = noPrecedente->ponteiro; } // Pegando o nó anterior ao index escolhido
 
-    novoNo->ponteiro = noPrecedente->ponteiro; 
-    novoNo->dado = valor;
-    noPrecedente->ponteiro = novoNo;
-    cabeca->quantidade++;
+        novoNo->ponteiro = noPrecedente->ponteiro; 
+        novoNo->dado = valor;
+        noPrecedente->ponteiro = novoNo;
+        cabeca->quantidade++;
+    }
+
+    return 1;
+}
+
+
+int removerDoIndex(noCabeca *cabeca, int index) {
+    no *noPrecedente, *noApagado;
+
+    if(cabeca->inicio == NULL) { return 0; }
+
+    if(index <= 0) { removerDoInicio(cabeca); }
+    else if(index >= cabeca->quantidade - 1) { removerDoFim(cabeca); }
+    else{
+        noPrecedente = cabeca->inicio;
+        for(int i = 0; i < index - 1; i++) { noPrecedente = noPrecedente->ponteiro; } // Pegando o nó anterior ao index escolhido
+
+        noApagado = noPrecedente->ponteiro;
+        noPrecedente->ponteiro = noApagado->ponteiro;
+        free(noApagado);
+
+        cabeca->quantidade--;
+    }
+    
+    return 1;
 }
 
 
@@ -186,6 +255,7 @@ int main() {
 
         printf("Adicionar outro elemento(S/N)? ");
         scanf(" %c", &entrada);
+        printf("\n");
 
         if(entrada != 83 && entrada != 115) { resp = 0; }
     }
@@ -193,7 +263,7 @@ int main() {
     resp = exibeLista(&cabeca);
     if(!resp) { printf("Lista vazia"); }
 
-    adicionarNoIndex(&cabeca, 1, 15);
+    removerDoIndex(&cabeca, 5);
 
     resp = exibeLista(&cabeca);
     if(!resp) { printf("Lista vazia"); }

@@ -1,3 +1,5 @@
+// Davi Araújo
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -17,8 +19,6 @@ int inicializa(noCabeca *cabeca) {
     cabeca->inicio = NULL;
     cabeca->fim = NULL;
     cabeca->quantidade = 0;
-
-    return 1;
 }
 
 
@@ -75,6 +75,38 @@ int adicionarNoFim(noCabeca *cabeca, int valor) {
 }
 
 
+int exibeLista(noCabeca *cabeca, int detalhes) {
+    no *noAtual;
+
+    printf("\n\n");
+    if(cabeca->inicio == NULL) { 
+        printf("[ Lista vazia ]"); 
+        return 0; 
+    }
+    noAtual = cabeca->inicio;
+
+    printf("[ ");
+    while(1) {
+        printf("%d", noAtual->dado);
+        noAtual = noAtual->ponteiro;
+
+        if(noAtual == NULL) { break; } 
+
+        printf(", "); // Esse esquema aqui é só para aparecer bonitinho
+    }
+
+    printf(" ]");
+    if(detalhes) {
+        printf("\n\nNumero de elementos: %d\n", cabeca->quantidade);
+        printf("Inicio: %d\n", cabeca->inicio->dado);
+        printf("Fim: %d\n", cabeca->fim->dado);
+    }
+    
+    return 1;
+}
+
+
+// Função requerida na atividade
 int removerDoInicio(noCabeca *cabeca) {
     no *noApagado = cabeca->inicio;
 
@@ -92,6 +124,7 @@ int removerDoInicio(noCabeca *cabeca) {
 }
 
 
+// Função requerida na atividade
 int removerDoFim(noCabeca *cabeca) {
     no *noApagado = cabeca->fim;
     no *noPrecedente;
@@ -115,6 +148,7 @@ int removerDoFim(noCabeca *cabeca) {
 }
 
 
+// Função requerida na atividade
 int destruirLista(noCabeca *cabeca) {
     no *noAtual, *noSeguinte;
 
@@ -143,31 +177,7 @@ int destruirLista(noCabeca *cabeca) {
 }
 
 
-int exibeLista(noCabeca *cabeca) {
-    no *noAtual;
-
-    if(cabeca->inicio == NULL) { return 0; }
-    noAtual = cabeca->inicio;
-
-    printf("\n[ ");
-    while(1) {
-        printf("%d", noAtual->dado);
-        noAtual = noAtual->ponteiro;
-
-        if(noAtual == NULL) { break; } 
-
-        printf(", "); // Esse esquema aqui é só para aparecer bonitinho
-    }
-
-    printf(" ]");
-    printf("\nNumero de elementos: %d\n", cabeca->quantidade);
-    printf("Inicio: %d\n", cabeca->inicio->dado);
-    printf("Fim: %d\n", cabeca->fim->dado);
-
-    return 1;
-}
-
-
+// Função requerida na atividade
 int procurarValor(noCabeca *cabeca, int valor) {
     no *noAtual;
     int index = 0, sair = 0;
@@ -191,6 +201,7 @@ int procurarValor(noCabeca *cabeca, int valor) {
 }
 
 
+// Função requerida na atividade
 int adicionarNoIndex(noCabeca *cabeca, int index, int valor) {
     no *novoNo, *noPrecedente;
 
@@ -216,6 +227,7 @@ int adicionarNoIndex(noCabeca *cabeca, int index, int valor) {
 }
 
 
+// Função requerida na atividade
 int removerDoIndex(noCabeca *cabeca, int index) {
     no *noPrecedente, *noApagado;
 
@@ -238,32 +250,168 @@ int removerDoIndex(noCabeca *cabeca, int index) {
 }
 
 
-int main() {
-    noCabeca cabeca;
-    int entrada, resp, escolha, estaInicializado;
+void t_Titulo(char *string) { printf("\n----- %s -----", string); }
 
-    printf("--- LISTA ENCADEADA ---");
+
+void p_AdicionarNo(noCabeca *cabeca) {
+    int valor, index, escolha;
+
+    system("cls");
+    t_Titulo("ADICIONAR NO");
+
+    printf("\n1 - Adicionar no inicio da lista");
+    printf("\n2 - Adicionar no fim da lista");
+    printf("\n3 - Adicionar no index");
     
-    printf("\n\n");
-    resp = exibeLista(&cabeca);
-    if(!resp) { 
-        if(estaInicializado) { printf("[ ]" ); }
-        else { printf("Lista nao inicializada"); }
-    }
-
-    printf("\n\n1 - Inicializar lista");
-    printf("\n2 - Adicionar nó");
-    printf("\n3 - Remover nó");
-    printf("\n4 - Apagar lista");
     printf("\n\nEscolha: ");
-    scanf("%d", escolha);
+    scanf("%d", &escolha);
+
+    printf("Valor: ");
+    scanf("%d", &valor);
 
     switch(escolha) {
-    case 1: 
-        printf("hey");
-        estaInicializado = inicializa(&cabeca);
+    case 1:
+        adicionarNoInicio(cabeca, valor);
+        break;
+    case 2:
+        adicionarNoFim(cabeca, valor);
+        break;
+    case 3:
+        printf("Index: ");
+        scanf("%d", &index);
+        adicionarNoIndex(cabeca, index, valor);
         break;
     }
 
+    printf("\nItem adicionado na lista\n\n");
+    system("pause");
+}
+
+
+void p_RemoverNo(noCabeca *cabeca) {
+    int index, escolha;
+
+    system("cls");
+    t_Titulo("REMOVER NO");
+
+    printf("\n1 - Remover no inicio da lista");
+    printf("\n2 - Remover no fim da lista");
+    printf("\n3 - Remover no index");
+
+    printf("\n\nEscolha: ");
+    scanf("%d", &escolha);
+
+    switch(escolha) {
+    case 1:
+        removerDoInicio(cabeca);
+        break;
+    case 2:
+        removerDoFim(cabeca);
+        break;
+    case 3:
+        printf("Index: ");
+        scanf("%d", &index);
+        removerDoIndex(cabeca, index);
+        break;
+    }
+
+    printf("\nItem removido da lista\n\n");
+    system("pause");
+}
+
+
+void p_ApagarLista(noCabeca *cabeca) {
+    char escolha;
+
+    system("cls");
+    t_Titulo("APAGAR LISTA");
+
+    printf("\n\nTem certeza que quer apagar todos os itens da lista(S/N)? ");
+    scanf(" %c", &escolha);
+
+    if(escolha == 's' || escolha == 'S') { destruirLista(cabeca); }
+    
+    printf("\nLista apagada\n\n");
+    system("pause");
+}
+
+
+void p_Detalhes(noCabeca *cabeca) {
+    system("cls");
+    t_Titulo("DETALHES");
+
+    exibeLista(cabeca, 1);
+
+    printf("\n");
+    system("pause");
+}
+
+
+void p_BuscarValor(noCabeca *cabeca) {
+    int valor, index;
+
+    system("cls");
+    t_Titulo("BUSCAR VALOR");
+
+    printf("\n\nValor: ");
+    scanf("%d", &valor);
+
+    index = procurarValor(cabeca, valor);
+    if(index == -1) { printf("\nEste valor nao foi encontrado na lista\n\n"); }
+    else { printf("\nEste valor foi encontrado no index %d da lista\n\n", index); }
+
+    system("pause");
+}
+
+
+int p_Sair() {
+    char escolha;
+
+    system("cls");
+    t_Titulo("SAIDA");
+
+    printf("\n\nDeseja sair(S/N)? ");
+    scanf(" %c", &escolha);
+
+    if(escolha == 's' || escolha == 'S') { return 0; }
+
+    printf("\nPrograma nao encerrado\n\n");
+    system("pause");
+}
+
+
+int main() {
+    noCabeca cabeca;
+    int entrada, resp, escolha, continuar = 1;
+
+    inicializa(&cabeca);
+
+    while(continuar) {
+        system("cls");
+        t_Titulo("LISTA ENCADEADA");
+
+        exibeLista(&cabeca, 0);
+
+        printf("\n\n1 - Adicionar no");
+        printf("\n2 - Remover no");
+        printf("\n3 - Apagar lista");
+        printf("\n4 - Buscar valor");
+        printf("\n5 - Detalhes");
+        printf("\n6 - Sair");
+        printf("\n\nEscolha: ");
+        scanf("%d", &escolha);
+
+        switch(escolha) {
+        case 1: p_AdicionarNo(&cabeca); break;
+        case 2: p_RemoverNo(&cabeca); break;
+        case 3: p_ApagarLista(&cabeca); break;
+        case 4: p_BuscarValor(&cabeca); break;
+        case 5: p_Detalhes(&cabeca); break;
+        case 6: continuar = p_Sair(); break;
+        }
+    }
+
+    printf("\nPrograma encerrado");
+    
     return 0;
 }

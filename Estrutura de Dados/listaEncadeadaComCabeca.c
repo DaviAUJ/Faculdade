@@ -205,10 +205,9 @@ int procurarValor(noCabeca *cabeca, int valor) {
 int adicionarNoIndex(noCabeca *cabeca, int index, int valor) {
     no *novoNo, *noPrecedente;
 
-    if(cabeca->inicio == NULL) { return 0; }
-
+    if(cabeca->inicio == NULL) { criarNoInicial(cabeca, valor); }
     // Caso o index dado não seja no meio da lista o novo nó vai para o inicio ou fim
-    if(index <= 0) { adicionarNoInicio(cabeca, valor); }
+    else if(index <= 0) { adicionarNoInicio(cabeca, valor); }
     else if(index >= cabeca->quantidade - 1) { adicionarNoFim(cabeca, valor); }
     else {
         novoNo = (no*) malloc(sizeof(no));
@@ -259,7 +258,7 @@ void p_AdicionarNo(noCabeca *cabeca) {
     system("cls");
     t_Titulo("ADICIONAR NO");
 
-    printf("\n1 - Adicionar no inicio da lista");
+    printf("\n\n1 - Adicionar no inicio da lista");
     printf("\n2 - Adicionar no fim da lista");
     printf("\n3 - Adicionar no index");
     
@@ -289,12 +288,12 @@ void p_AdicionarNo(noCabeca *cabeca) {
 
 
 void p_RemoverNo(noCabeca *cabeca) {
-    int index, escolha;
+    int index, escolha, deuCerto = 1;
 
     system("cls");
     t_Titulo("REMOVER NO");
 
-    printf("\n1 - Remover no inicio da lista");
+    printf("\n\n1 - Remover no inicio da lista");
     printf("\n2 - Remover no fim da lista");
     printf("\n3 - Remover no index");
 
@@ -303,19 +302,20 @@ void p_RemoverNo(noCabeca *cabeca) {
 
     switch(escolha) {
     case 1:
-        removerDoInicio(cabeca);
+        deuCerto = removerDoInicio(cabeca);
         break;
     case 2:
-        removerDoFim(cabeca);
+        deuCerto = removerDoFim(cabeca);
         break;
     case 3:
         printf("Index: ");
         scanf("%d", &index);
-        removerDoIndex(cabeca, index);
+        deuCerto = removerDoIndex(cabeca, index);
         break;
     }
 
-    printf("\nItem removido da lista\n\n");
+    if(deuCerto) { printf("\nItem removido da lista\n\n"); }
+    else { printf("\nItem não removido; Lista Vazia\n\n"); }
     system("pause");
 }
 

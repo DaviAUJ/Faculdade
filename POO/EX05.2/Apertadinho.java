@@ -5,19 +5,25 @@ public class Apertadinho {
     }
 
     private int NUMERO_SECRETO;
-    public int inicio;
-    public int fim;
+    private int minimo;
+    private int maximo;
+    public int minTemp;
+    public int maxTemp;
     
-    public Apertadinho(int inicio, int fim) {
-        this.inicio = inicio;
-        this.fim = fim;
+    public Apertadinho(int minimoPadrao, int maximoPadrao) {
+        this.minimo = minimoPadrao;
+        this.maximo = maximoPadrao;
     }
 
     public void iniciar() {
-        NUMERO_SECRETO = randint(inicio, fim);
+        NUMERO_SECRETO = randint(minimo, maximo);
+        minTemp = minimo;
+        maxTemp = maximo;
     }
 
-    
-    
     public boolean receberChute(int chute) { return chute == NUMERO_SECRETO; }
+
+    public void setMinimo(int novoValor) { minimo = novoValor; }
+
+    public void setMaximo(int novoValor) { maximo = novoValor; }
 }

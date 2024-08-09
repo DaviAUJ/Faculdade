@@ -1,6 +1,7 @@
 import java.util.Scanner;
 
 public class Q2 {
+    @SuppressWarnings("resource")
     public static void main(String[] args) {
         Scanner entrada = new Scanner(System.in);
 

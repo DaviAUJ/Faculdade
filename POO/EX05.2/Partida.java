@@ -1,5 +1,6 @@
 import java.util.Scanner;
 
+@SuppressWarnings("resource")
 public class Partida {
     private static void p_Jogar(Apertadinho jogo) {
         Scanner entrada = new Scanner(System.in);

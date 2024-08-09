@@ -1,12 +1,15 @@
 import java.util.Scanner;
 
 public class Q1 {
+    @SuppressWarnings("resource")
     public static void main(String[] args) {
         Scanner dado = new Scanner(System.in);
         
         System.out.println("Seja bem-vindo ao parque de diversão Avaj!");
+
         System.out.printf("Digite sua altura em metros: ");
         float altura = dado.nextFloat();
+
         System.out.printf("Digite sua idade: ");
         int idade = dado.nextInt();
 

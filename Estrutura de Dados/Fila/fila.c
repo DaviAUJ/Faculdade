@@ -22,16 +22,16 @@ void inicializarFila(st_Fila *novaFila, int capacidade) {
 
     novaFila->capacidade = capacidade;
     novaFila->inicio = 0;
-    novaFila->fim = -1;
+    novaFila->fim = 0;
 }
 
 
 void inserir(st_Fila *fila, st_Musica novaMusica) {
     // Quando o fim da fila chega no fim do array seu valor volta a ser -1 para
     // o ++ botar ele no começo do array
-    if(fila->fim == fila->capacidade - 1) { fila->fim = -1; }
-
-    fila->fim++;
+    if(fila->fim == fila->capacidade - 1) { fila->fim = 0; }
+    else { fila->fim++; }
+    
     fila->musicas[fila->fim] = novaMusica;
 }
 
@@ -46,6 +46,15 @@ st_Musica remover(st_Fila *fila) {
 }
 
 
-int main() {
+int estaVazia(st_Fila *fila) {
+    return fila->inicio == fila->fim;
+}
 
+int estaCheia(st_Fila *fila) {
+    
+}
+
+
+int main() {
+    
 }

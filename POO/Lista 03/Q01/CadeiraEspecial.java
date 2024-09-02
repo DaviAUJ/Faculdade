@@ -2,6 +2,8 @@ public class CadeiraEspecial extends Cadeira {
     private final int rodasGrandes = 2;
     private final int rodasPequenas = 2;
 
+    public CadeiraEspecial() {}
+
     public int getRodasGrandes() {
         return rodasGrandes;
     }

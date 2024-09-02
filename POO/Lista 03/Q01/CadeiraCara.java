@@ -1,7 +1,14 @@
 public class CadeiraCara extends Cadeira {
     private String materialRecheio;
     private String materialEstofado;
-    private boolean estaRasgado;
+    private boolean estaRasgado = false;
+
+    public CadeiraCara() {}
+
+    public CadeiraCara(String materialRecheio, String materialEstofado) {
+        this.materialRecheio = materialRecheio;
+        this.materialEstofado = materialEstofado;
+    }
 
     public String getMaterialRecheio() {
         return materialRecheio;

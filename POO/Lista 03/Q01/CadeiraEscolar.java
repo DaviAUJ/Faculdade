@@ -2,6 +2,12 @@ public class CadeiraEscolar extends Cadeira {
     private String tipoBraco;
     private boolean estaQuebrada;
 
+    public CadeiraEscolar() {}
+
+    public CadeiraEscolar(String tipoBraco) {
+        this.tipoBraco = tipoBraco;
+    }
+
     public String getTipoBraco() {
         return tipoBraco;
     }

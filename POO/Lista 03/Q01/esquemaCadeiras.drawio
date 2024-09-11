@@ -20,75 +20,75 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="6" value="CadeiraCara" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
-                    <mxGeometry x="70" y="340" width="220" height="170" as="geometry"/>
+                    <mxGeometry x="60" y="340" width="250" height="260" as="geometry"/>
                 </mxCell>
                 <mxCell id="7" value="- materialRecheio: String&#10;- materialEstofado: String&#10;- estaRasgado: boolean" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="6" vertex="1">
-                    <mxGeometry y="26" width="220" height="54" as="geometry"/>
+                    <mxGeometry y="26" width="250" height="54" as="geometry"/>
                 </mxCell>
                 <mxCell id="8" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="6" vertex="1">
-                    <mxGeometry y="80" width="220" height="8" as="geometry"/>
+                    <mxGeometry y="80" width="250" height="8" as="geometry"/>
                 </mxCell>
-                <mxCell id="9" value="+ getRecheio(): String&#10;+ getEstofado(): String&#10;+ getRasgado(): boolean&#10;+ rasgarEstofado(): void&#10;+ remendarEstofado(): void " style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="6" vertex="1">
-                    <mxGeometry y="88" width="220" height="82" as="geometry"/>
+                <mxCell id="9" value="+ CadeiraCara(): CadeiraCara&#10;+ CadeiraCara(String, String): CadeiraCara&#10;+ getRecheio(): String&#10;+ getEstofado(): String&#10;+ getRasgado(): boolean&#10;+ rasgarEstofado(): void&#10;+ remendarEstofado(): void " style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="6" vertex="1">
+                    <mxGeometry y="88" width="250" height="172" as="geometry"/>
                 </mxCell>
                 <mxCell id="10" value="CadeiraEscolar" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
-                    <mxGeometry x="370" y="340" width="160" height="150" as="geometry"/>
+                    <mxGeometry x="370" y="340" width="240" height="210" as="geometry"/>
                 </mxCell>
                 <mxCell id="24" value="" style="endArrow=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="10" source="10" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="80" y="-10" as="sourcePoint"/>
-                        <mxPoint x="79.5" y="-40" as="targetPoint"/>
+                        <mxPoint x="120" y="-40" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="11" value="- tipoBraco: String&#10;- estaQuebrada: boolean" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="10" vertex="1">
-                    <mxGeometry y="26" width="160" height="44" as="geometry"/>
+                    <mxGeometry y="26" width="240" height="44" as="geometry"/>
                 </mxCell>
                 <mxCell id="12" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="10" vertex="1">
-                    <mxGeometry y="70" width="160" height="8" as="geometry"/>
+                    <mxGeometry y="70" width="240" height="8" as="geometry"/>
                 </mxCell>
-                <mxCell id="13" value="+ getTipo() : int&#10;+ estaQuebrada(): boolean&#10;+ quebrarBraco(): void&#10;+ consertarBraco(): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="10" vertex="1">
-                    <mxGeometry y="78" width="160" height="72" as="geometry"/>
+                <mxCell id="13" value="+ CadeiraEscolar(): CadeiraEscolar&#10;+ CadeiraEscolar(String): CadeiraEscolar&#10;+ getTipo() : int&#10;+ estaQuebrada(): boolean&#10;+ quebrarBraco(): void&#10;+ consertarBraco(): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="10" vertex="1">
+                    <mxGeometry y="78" width="240" height="132" as="geometry"/>
                 </mxCell>
                 <mxCell id="14" value="CadeiraModerna&#10;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
-                    <mxGeometry x="560" y="340" width="170" height="170" as="geometry"/>
+                    <mxGeometry x="650" y="340" width="310" height="200" as="geometry"/>
                 </mxCell>
                 <mxCell id="15" value="- tipoTronco: String&#10;- tipoRodinhas: String&#10;- quantRodinhas: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="14" vertex="1">
-                    <mxGeometry y="26" width="170" height="54" as="geometry"/>
+                    <mxGeometry y="26" width="310" height="54" as="geometry"/>
                 </mxCell>
                 <mxCell id="16" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="14" vertex="1">
-                    <mxGeometry y="80" width="170" height="8" as="geometry"/>
+                    <mxGeometry y="80" width="310" height="8" as="geometry"/>
                 </mxCell>
-                <mxCell id="17" value="- getTipoTronco(): String&#10;- getTipoRodinhas(): String&#10;- getQuantRodinhas(): int&#10;- setRodinhas(String): void&#10;- setTipoTronco(String): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="14" vertex="1">
-                    <mxGeometry y="88" width="170" height="82" as="geometry"/>
+                <mxCell id="17" value="+ CadeiraMorderna(): CadeiraModerna&#10;+ CadeiraModerna(String, String, int): CadeiraModerna&#10;+ getTipoTronco(): String&#10;+ getTipoRodinhas(): String&#10;+ getQuantRodinhas(): int&#10;+ setRodinhas(String): void&#10;+ setTipoTronco(String): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="14" vertex="1">
+                    <mxGeometry y="88" width="310" height="112" as="geometry"/>
                 </mxCell>
                 <mxCell id="18" value="CadeiraEspecial&#10;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
-                    <mxGeometry x="750" y="340" width="160" height="130" as="geometry"/>
+                    <mxGeometry x="990" y="340" width="210" height="140" as="geometry"/>
                 </mxCell>
                 <mxCell id="19" value="- rodasGrandes: int&#10;- rodasPequenas: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="18" vertex="1">
-                    <mxGeometry y="26" width="160" height="34" as="geometry"/>
+                    <mxGeometry y="26" width="210" height="34" as="geometry"/>
                 </mxCell>
                 <mxCell id="20" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="18" vertex="1">
-                    <mxGeometry y="60" width="160" height="8" as="geometry"/>
+                    <mxGeometry y="60" width="210" height="8" as="geometry"/>
                 </mxCell>
-                <mxCell id="21" value="+ getRodasGrandes(): int&#10;+ getRodasPequenas(): int&#10;+ getTotalRodas(): int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="18" vertex="1">
-                    <mxGeometry y="68" width="160" height="62" as="geometry"/>
+                <mxCell id="21" value="+ CadeiraEspecial(): CadeiraEspecial&#10;+ getRodasGrandes(): int&#10;+ getRodasPequenas(): int&#10;+ getTotalRodas(): int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="18" vertex="1">
+                    <mxGeometry y="68" width="210" height="72" as="geometry"/>
                 </mxCell>
                 <mxCell id="23" value="" style="endArrow=none;html=1;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="180" y="300" as="sourcePoint"/>
-                        <mxPoint x="840" y="300" as="targetPoint"/>
+                        <mxPoint x="1070" y="300" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="25" value="" style="endArrow=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="640" y="340" as="sourcePoint"/>
-                        <mxPoint x="639.5" y="300" as="targetPoint"/>
+                        <mxPoint x="1070" y="340" as="sourcePoint"/>
+                        <mxPoint x="1069.5" y="300" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="26" value="" style="endArrow=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="840.5" y="340" as="sourcePoint"/>
-                        <mxPoint x="840" y="300" as="targetPoint"/>
+                        <mxPoint x="810.5" y="340" as="sourcePoint"/>
+                        <mxPoint x="810" y="300" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="30" value="Loja" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
@@ -104,7 +104,7 @@
                     <mxGeometry y="68" width="180" height="72" as="geometry"/>
                 </mxCell>
                 <mxCell id="36" value="" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=3;startSize=26;" parent="1" vertex="1">
-                    <mxGeometry x="370" y="140" width="20" height="30" as="geometry"/>
+                    <mxGeometry x="370" y="165" width="20" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="37" value="" style="endArrow=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="36" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">

@@ -1,12 +1,10 @@
 public class Humano extends Animal {
     public Humano() {
-        massa = 0;
-        tamanho = "";
+        super();
     }
     
     public Humano(float massa, String tamanho) {
-        this.massa = massa;
-        this.tamanho = tamanho;
+        super(massa, tamanho);
     }
 
     @Override

@@ -1,17 +1,17 @@
 public abstract class Animal {
-    protected float massa;
-    protected String tamanho;
-    /* 
-    public Animal() {
+    private float massa;
+    private String tamanho;
+    
+    protected Animal() {
         massa = 0;
         tamanho = "";
     }
     
-    public Animal(float massa, String tamanho) {
+    protected Animal(float massa, String tamanho) {
         this.massa = massa;
         this.tamanho = tamanho;
     }
-    */
+    
     public void setMassa(float massa) {
         this.massa = massa;
     }

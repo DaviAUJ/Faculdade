@@ -1,12 +1,10 @@
 public class Peixe extends Humano{
     public Peixe() {
-        massa = 0;
-        tamanho = "";
+        super();
     }
     
     public Peixe(float massa, String tamanho) {
-        this.massa = massa;
-        this.tamanho = tamanho;
+        super(massa, tamanho);
     }
 
     @Override

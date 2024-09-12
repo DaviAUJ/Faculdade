@@ -1,12 +1,10 @@
 public class Passaro extends Humano {
     public Passaro() {
-        massa = 0;
-        tamanho = "";
+        super();
     }
     
     public Passaro(float massa, String tamanho) {
-        this.massa = massa;
-        this.tamanho = tamanho;
+        super(massa, tamanho);
     }
 
     @Override

@@ -15,8 +15,6 @@ module somador4Bits_tb;
         A = 4'b0;
         B = 4'b0;
 
-        $monitor("Time=%0d: A=%b B=%b C=%b CARRY_OUT=%b", $time, A, B, C, CARRY_OUT);
-
         for(integer i = 0; i < 16; i = i + 1) begin
             A = i[3:0];
 

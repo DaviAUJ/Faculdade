@@ -12,18 +12,13 @@ module somador4Bits_tb;
         $dumpfile("Somador4Bits.vcd");
         $dumpvars(0, somador4Bits_tb);
 
-        A = 4'b0;
-        B = 4'b0;
-
-        for(integer i = 0; i < 16; i = i + 1) begin
-            A = i[3:0];
-
-            for(integer j = 0; j < 16; j = j + 1) begin
-                B = j[3:0];
-                #10;
-            end
+        repeat(100) begin
+            #10;
+            A = $urandom_range(15, 0);
+            B = $urandom_range(15, 0);
         end
 
+        #10;
         $finish;
     end
 endmodule

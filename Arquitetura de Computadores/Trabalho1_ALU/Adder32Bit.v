@@ -9,8 +9,16 @@ module Adder32Bit(
     wire [31:0] CoutWires;
     assign Cout = CoutWires[31];
 
-    // Deve ter forma menos trabalhosa de fazer isso
-    HalfAdder halfAdder0 (R[0], CoutWires[0], A[0], B[0]);
+    HalfAdder halfAdder (R[0], CoutWires[0], A[0], B[0]);
+
+    generate
+        genvar i;
+
+        for(i = 1; i < 32; i = i + 1) begin
+            FullAdder fullAdder (R[i], CoutWires[i], A[i], B[i], CoutWires[i - 1]);
+        end
+    endgenerate
+    /*
     FullAdder FullAdder1 (R[1], CoutWires[1], A[1], B[1], CoutWires[0]);
     FullAdder FullAdder2 (R[2], CoutWires[2], A[2], B[2], CoutWires[1]);
     FullAdder FullAdder3 (R[3], CoutWires[3], A[3], B[3], CoutWires[2]);
@@ -42,4 +50,5 @@ module Adder32Bit(
     FullAdder FullAdder29 (R[29], CoutWires[29], A[29], B[29], CoutWires[28]);
     FullAdder FullAdder30 (R[30], CoutWires[30], A[30], B[30], CoutWires[29]);
     FullAdder FullAdder31 (R[31], CoutWires[31], A[31], B[31], CoutWires[30]);
+    */
 endmodule

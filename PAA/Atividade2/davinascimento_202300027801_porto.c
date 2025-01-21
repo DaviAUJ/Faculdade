@@ -1,17 +1,16 @@
 #include <stdio.h>
-
-#define tamCodigo 12
-#define tamCNPJ 19
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct container {
-    unsigned long long int codigo;
-    char cnpj[tamCNPJ];
+    char codigo[12];
+    char cnpj[19];
     int peso;
     int ordem;
 } st_Container;
 
 int pegarNumeroContainers(FILE* arquivo) {
-    char numero[6];
+    char numero[7];
     int saida;
 
     fgets(numero, 7, arquivo);
@@ -21,23 +20,33 @@ int pegarNumeroContainers(FILE* arquivo) {
 }
 
 void pegarContainers(FILE* arquivo, st_Container* destino, int quantidade) {
-    for(int a = 0; a < quantidade; a++) {
+    char infos[38];
+    st_Container container;
 
+    for(int a = 0; a < quantidade; a++) {
+        fgets(infos, 38, arquivo);
+
+        sscanf(infos, "%s %s %d", &container.codigo, &container.cnpj, &container.peso);
+        container.ordem = a;
+
+        destino[a] = container;
     }
+}
+
+st_Container* ordernarPorCodigo(st_Container* original) {
+
 }
 
 int main(int argc, char** argv) {
     FILE* entrada = fopen(argv[1], "r");
-    FILE* saida = fopen(argv[2], "A");
 
     int numContainers = pegarNumeroContainers(entrada);
-    int numVerificoes;
+    st_Container containers[numContainers];
+
+    pegarContainers(entrada, containers, numContainers);
     
-    
-    
-    // fgets()
-    // sscanf()
-    // fprintf()
+
+    fclose(entrada);
 
     return 0;
 }

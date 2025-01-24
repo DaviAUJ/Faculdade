@@ -1,7 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int main() {
-    printf("%d", sizeof(int));
+    int teste = rand();
+
+    printf("%d", teste);
 
     return 0;
 }

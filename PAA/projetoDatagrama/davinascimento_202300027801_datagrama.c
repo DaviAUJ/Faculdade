@@ -61,11 +61,11 @@ void colocarNaEspera(st_Espera* espera, st_Pacote pacote) {
 }
 
 void printarPacote(FILE* arquivo, st_Pacote pacote) {
-    for(int32_t r = 0; r < pacote.tamanho; r++) {
-        fprintf(arquivo, "%X,", pacote.dados[r]);
+    for(int32_t r = 0; r < pacote.tamanho - 1; r++) {
+        fprintf(arquivo, "%02X,", pacote.dados[r]);
     }
 
-    fprintf(arquivo, "%X|", pacote.dados[pacote.tamanho - 1]);
+    fprintf(arquivo, "%02X|", pacote.dados[pacote.tamanho - 1]);
 
     free(pacote.dados);
 }
@@ -105,7 +105,7 @@ void heapifyMax(st_Pacote* vetor, int32_t inicio, int32_t fim, int32_t index) {
 }
 
 void construirHeapMax(st_Pacote* vetor, int32_t inicio, int32_t fim) {
-    int32_t primeiro = (fim - inicio - 1) / 2;
+    int32_t primeiro = (fim - inicio) / 2 + inicio;
 
     for(int32_t k = primeiro; k >= inicio; k--) {
         heapifyMax(vetor, inicio, fim, k);
@@ -115,10 +115,10 @@ void construirHeapMax(st_Pacote* vetor, int32_t inicio, int32_t fim) {
 void heapsort(st_Pacote* vetor, int32_t inicio, int32_t fim) {
     construirHeapMax(vetor, inicio, fim);
 
-    for(int32_t m = fim; m > 0; m--) {
+    for(int32_t m = fim; m > inicio; m--) {
         trocarPacote(&vetor[inicio], &vetor[m]);
 
-        heapifyMax(vetor, inicio, m, inicio);
+        heapifyMax(vetor, inicio, m - 1, inicio);
     }
 }
 
@@ -139,18 +139,20 @@ int main(int argc, char** argv) {
     lista.menorId = totalPacotes;
     
     fprintf(saida, "|");
+    bool printou = false;
     for(int32_t q = 1; q <= totalPacotes; q++) {
         int32_t idDaVez = pegarProxInt(entrada);
         int32_t tamDaVez = pegarProxInt(entrada);
-        
+
         if(idDaVez == proxId) {
             for(int32_t w = 0; w < tamDaVez - 1; w++) {
-                fprintf(saida, "%X,", pegarProxHex(entrada));
+                fprintf(saida, "%02X,", pegarProxHex(entrada));
             }
 
-            fprintf(saida, "%X|", pegarProxHex(entrada));
+            fprintf(saida, "%02X|", pegarProxHex(entrada));
 
             proxId++;
+            printou = true;
         }
         else {
             st_Pacote pacote = criarPacote(idDaVez, tamDaVez);
@@ -162,25 +164,35 @@ int main(int argc, char** argv) {
             colocarNaEspera(&lista, pacote);
         }
 
-        if(q % quantPacotes == 0 && lista.menorId == proxId) {
-            while(proxId == lista.pacotes[lista.inicio].id) {
-                printarPacote(saida, lista.pacotes[lista.inicio]);
-                lista.inicio++;
-                proxId++;
+        if(q % quantPacotes == 0 || q == totalPacotes) {
+            if(lista.menorId == proxId) {
+                while(proxId == lista.pacotes[lista.inicio].id) {
+                    printarPacote(saida, lista.pacotes[lista.inicio]);
+                    printou = true;
+                    lista.inicio++;
+                    proxId++;
+                }
+
+                heapsort(lista.pacotes, lista.inicio, lista.fim);
+
+                while(proxId == lista.pacotes[lista.inicio].id) {
+                    printarPacote(saida, lista.pacotes[lista.inicio]);
+                    printou = true;
+                    lista.inicio++;
+                    proxId++;
+                }
+
+                lista.menorId = lista.pacotes[lista.inicio].id;
             }
-
-            heapsort(lista.pacotes, lista.inicio, lista.fim);
-
-            while(proxId == lista.pacotes[lista.inicio].id) {
-                printarPacote(saida, lista.pacotes[lista.inicio]);
-                lista.inicio++;
-                proxId++;
+            
+            if(printou && q != totalPacotes) {
+                fprintf(saida, "\n|");
+                printou = false;
             }
-
-            lista.menorId = lista.pacotes[lista.inicio].id;
-            fprintf(saida, "\n|");
         }
     }
+
+    
 
     free(lista.pacotes);
 

@@ -192,8 +192,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    
-
     free(lista.pacotes);
 
     fclose(entrada);

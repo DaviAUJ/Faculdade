@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 int32_t passos = 0;
 
@@ -26,25 +27,17 @@ void trocarInt32(int32_t* a, int32_t* b) {
     *a = *b;
     *b = temp;
 }
-// 2, 1, 2
+
 int32_t* mediana(int32_t* num1, int32_t* num2, int32_t* num3) {
-    int32_t* v[3] = {num1, num2, num3};
-    int32_t* aux;
-    
-    for(int8_t i = 1; i < 3; i++) {
-        int8_t f = i;
-        aux = v[i];
-
-        while(f > 0 && *v[f - 1] > *aux) {
-            v[f] = v[f - 1];
-
-            f--;
-        }
-
-        v[f] = aux;
+    if(*num1 <= *num2 && *num2 <= *num3 || *num1 >= *num2 && *num2 > *num3) {
+        return num2;
     }
 
-    return v[1];
+    if(*num1 > *num2 && *num1 < *num3 || *num1 < *num2 && *num1 > *num3) {
+        return num1;
+    }
+
+    return num3;
 }
 
 

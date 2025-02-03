@@ -15,22 +15,18 @@ typedef struct deltaPeso {
 } st_DeltaPeso;
 
 int pegarNumeroContainers(FILE* arquivo) {
-    char numero[12];
     int saida;
     
-    fgets(numero, 12, arquivo);
-    sscanf(numero, "%d", &saida);
+    fscanf(arquivo, "%d ", &saida);
 
     return saida;
 }
 
 int pegarNumeroChecagens(FILE* arquivo, int numContainers) {
-    char numero[12];
     int saida;
     
-    fseek(arquivo, numContainers * 38, SEEK_CUR);
-    fgets(numero, 12, arquivo);
-    sscanf(numero, "%d", &saida);
+    fseek(arquivo, numContainers * 37 - 1, SEEK_CUR);
+    fscanf(arquivo, "%d ", &saida);
 
     return saida;
 }
@@ -217,6 +213,8 @@ int main(int argc, char** argv) {
 
     int numListagens = pegarNumeroContainers(entrada);
     int numChecagens = pegarNumeroChecagens(entrada, numListagens);
+
+    printf("%d - %d", numListagens, numChecagens);
 
     st_Container checagens[numChecagens];
     st_DeltaPeso pesosDiferentes[numChecagens];

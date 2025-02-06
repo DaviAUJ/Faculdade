@@ -1,2 +1,7 @@
 module MIPSCicloUnico();
-    reg [7:0] PC = 8'b0;
+    reg [31:0] PC;
+
+    initial begin
+        PC = 32'b0
+    end
+endmodule

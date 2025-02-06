@@ -1,33 +1,51 @@
-`include "SignalExtend.v"
+`include "ALUControl.v"
 `timescale 1ns/100ps
 
 module testbench;
-    reg [15:0] A;
-    wire [31:0] Z;
+    reg [1:0] A;
+    reg [5:0] B;
+    wire [3:0] Z;
 
-    SignalExtend test (A, Z);
+    ALUControl test (A, B, Z);
 
     initial begin
         $dumpfile("testbench.vcd");
         $dumpvars(0, testbench);
 
-        A = 16'b0;
+
+        A = 2'b0;
+        B = 6'bXX0000;
+        #1
+
+        B = 6'bXX0010;
 
         #1
 
-        A = 16'b1;
+        A = 2'b1;
+        B = 6'bXX0000;
+        #1
+
+        B = 6'bXX0010;
 
         #1
 
-        A = 16'b111;
+        A =2'b10;
+        B = 6'bXX0000;
+        #1
+
+        B = 6'bXX0010;
 
         #1
 
-        A = 16'b11111011;
+        B = 6'bXX0100;
 
         #1
 
-        A = 16'b1101101100111001;
+        B = 6'bXX0101;
+
+        #1
+
+        B = 6'bXX1010;
 
         #1
 

@@ -1,3 +1,3 @@
-module Add4(input wire [7:0] number, output wire [7:0] out);
-    assign out = number + 8'b100;
+module Add4(input wire [31:0] number, output wire [31:0] out);
+    assign out = number + 32'b100;
 endmodule

@@ -1,8 +1,9 @@
 module Registers(
-    input [4:0] readReg1, readReg2, writeReg
-    input writeEnable,
-    input [31:0] writeData,
-    output [31:0] readData1, readData2
+    input wire clk,
+    input wire [4:0] readReg1, readReg2, writeReg,
+    input wire writeEnable,
+    input wire [31:0] writeData,
+    output wire [31:0] readData1, readData2
 );
     reg [31:0] registers [31:0];
 
@@ -16,7 +17,7 @@ module Registers(
     assign readData1 = registers[readReg1];
     assign readData2 = registers[readReg2];
 
-    always @(*) begin
+    always @(posedge clk) begin
         if(writeEnable && writeReg != 5'b0) begin
             registers[writeReg] <= writeData;
         end

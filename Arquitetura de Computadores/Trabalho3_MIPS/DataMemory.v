@@ -22,7 +22,7 @@ module DataMemory(
     assign readData = (MemRead) ? memory[address[9:2]] : 32'b0;
 
     // Escrita combinacional
-    always @(*) begin
+    always @(posedge clk) begin
         if (MemWrite) begin
             memory[address[9:2]] = writeData; // Escreve na memória
         end

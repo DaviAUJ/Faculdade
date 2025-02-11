@@ -1,54 +1,47 @@
-`include "ALUControl.v"
-`timescale 1ns/100ps
+`include "MIPSCicloUnico.v"
+`timescale 1ns/1ns
 
 module testbench;
-    reg [1:0] A;
-    reg [5:0] B;
-    wire [3:0] Z;
+    reg clk;
+    reg rst;
 
-    ALUControl test (A, B, Z);
+    // Guarda o que tem nos registradores para mostrar no GTKWave
+    reg [31:0] registers [31:0];
+
+    integer iterator;
+    integer iterator2;
+
+    MIPSCicloUnico test (clk, rst);
+
+    always #5 clk = ~clk;
 
     initial begin
         $dumpfile("testbench.vcd");
         $dumpvars(0, testbench);
 
+        // Este for junto do bloco always abaixo serve para monitorar os registradores lá no GTKWave
+        for(iterator2 = 0; iterator2 < 32; iterator2 = iterator2 + 1) begin
+            $dumpvars(1, registers[iterator2]);
+        end
 
-        A = 2'b0;
-        B = 6'bXX0000;
-        #1
+        // inicializa clock
+        clk = 0;
 
-        B = 6'bXX0010;
+        // reset para começar tudo certo
+        rst = 1;
+        #10
 
-        #1
+        rst = 0;
+        #10
 
-        A = 2'b1;
-        B = 6'bXX0000;
-        #1
-
-        B = 6'bXX0010;
-
-        #1
-
-        A =2'b10;
-        B = 6'bXX0000;
-        #1
-
-        B = 6'bXX0010;
-
-        #1
-
-        B = 6'bXX0100;
-
-        #1
-
-        B = 6'bXX0101;
-
-        #1
-
-        B = 6'bXX1010;
-
-        #1
-
+        // Fim da simulação após 100 ciclos de clock, altere o intervalo a baixo para aumentar a quantidade de ciclos
+        #1000
         $finish;
+    end
+    
+    always @(posedge clk) begin
+        for (iterator = 0; iterator < 32; iterator = iterator + 1) begin
+            registers[iterator] = testbench.test.Registers0.registers[iterator];
+        end
     end
 endmodule

@@ -29,11 +29,11 @@ void trocarInt32(int32_t* a, int32_t* b) {
 }
 
 int32_t* mediana(int32_t* num1, int32_t* num2, int32_t* num3) {
-    if(*num1 <= *num2 && *num2 <= *num3 || *num1 >= *num2 && *num2 > *num3) {
+    if((*num1 <= *num2 && *num2 <= *num3) || (*num1 >= *num2 && *num2 > *num3)) {
         return num2;
     }
 
-    if(*num1 > *num2 && *num1 < *num3 || *num1 < *num2 && *num1 > *num3) {
+    if((*num1 > *num2 && *num1 < *num3) || (*num1 < *num2 && *num1 > *num3)) {
         return num1;
     }
 

@@ -8,7 +8,8 @@ module MainControl(
     output reg [1:0] ALUOp,
     output reg memWrite,
     output reg ALUSrc,
-    output reg regWrite
+    output reg regWrite,
+    output reg link
 );  
     always @(*) begin
         case(opcode)
@@ -23,6 +24,7 @@ module MainControl(
                 memWrite = 1'b0;
                 ALUSrc = 1'b0;
                 regWrite = 1'b1;
+                link = 1'b0;
             end
 
             // lw
@@ -36,6 +38,7 @@ module MainControl(
                 memWrite = 1'b0;
                 ALUSrc = 1'b1;
                 regWrite = 1'b1;
+                link = 1'b0;
             end
 
             // sw
@@ -49,6 +52,7 @@ module MainControl(
                 memWrite = 1'b1;
                 ALUSrc = 1'b1;
                 regWrite = 1'b0;
+                link = 1'b0;
             end
 
             // beq
@@ -62,6 +66,7 @@ module MainControl(
                 memWrite = 1'b0;
                 ALUSrc = 1'b0;
                 regWrite = 1'b0;
+                link = 1'b0;
             end
 
             // addi
@@ -75,6 +80,7 @@ module MainControl(
                 memWrite = 1'b0;
                 ALUSrc = 1'b1;
                 regWrite = 1'b1;
+                link = 1'b0;
             end
 
             // jump
@@ -87,11 +93,27 @@ module MainControl(
                 ALUOp = 2'bXX;
                 memWrite = 1'b0;
                 ALUSrc = 1'bX;
-                regWrite = 1'b0;
+                regWrite = 1'b1;
+                link = 1'b0;
             end 
+
+            // jal
+            6'b11: begin
+                regDst = 1'bX;
+                jump = 1'b1;
+                branch = 1'b0;
+                memRead = 1'bX;
+                memToReg = 1'bX;
+                ALUOp = 2'bXX;
+                memWrite = 1'b0;
+                ALUSrc = 1'bX;
+                regWrite = 1'b1;
+                link = 1'b1;
+            end
 
             default: begin
                 regDst = 1'b0;
+                jump = 1'b0;
                 branch = 1'b0;
                 memRead = 1'b0;
                 memToReg = 1'b0;
@@ -99,6 +121,7 @@ module MainControl(
                 memWrite = 1'b0;
                 ALUSrc = 1'b0;
                 regWrite = 1'b0;
+                link = 1'b0;
             end
         endcase
     end

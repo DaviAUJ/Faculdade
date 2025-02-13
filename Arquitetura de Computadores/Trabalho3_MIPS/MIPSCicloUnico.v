@@ -19,11 +19,11 @@ module MIPSCicloUnico(input wire clk, input wire rst);
     ProgramCounter PC (clk, rst, muxOut4, PCValue);
 
     wire [31:0] instruction;
-    InstructionMem InstructionMem0 (PCValue, instruction);
+    InstructionMem InstructionMem (PCValue, instruction);
 
-    wire regDst, jump, branch, memRead, memToReg, memWrite, ALUSrc, regWrite;
+    wire regDst, jump, branch, memRead, memToReg, memWrite, ALUSrc, regWrite, link;
     wire [1:0] ALUOp;
-    MainControl MainControl0 (
+    MainControl MainControl (
         instruction[31:26],
         regDst,
         jump,
@@ -33,18 +33,19 @@ module MIPSCicloUnico(input wire clk, input wire rst);
         ALUOp,
         memWrite,
         ALUSrc,
-        regWrite
+        regWrite,
+        link
     );
 
     wire [4:0] muxOut0;
-    Mux5x2to1 Mux0 (instruction[20:16], instruction[15:11], regDst, muxOut0);
+    Mux5x2to1 Mux (instruction[20:16], instruction[15:11], regDst, muxOut0);
 
     wire [31:0] readData1, readData2;
-    Registers Registers0 (
+    Registers Registers (
         clk,
         instruction[25:21],
         instruction[20:16],
-        muxOut0,
+        muxOut5,
         regWrite,
         muxOut2,
         readData1,
@@ -52,20 +53,20 @@ module MIPSCicloUnico(input wire clk, input wire rst);
     );
     
     wire [31:0] ext;
-    SignalExtend SignalExtend0 (instruction[15:0], ext);
+    SignalExtend SignalExtend (instruction[15:0], ext);
 
     wire [3:0] operation;
-    ALUControl ALUControl0 (ALUOp, instruction[5:0], operation);
+    ALUControl ALUControl (ALUOp, instruction[5:0], operation);
 
     wire [31:0] muxOut1;
     Mux32x2to1 Mux1 (readData2, ext, ALUSrc, muxOut1);
 
     wire [31:0] ALUOut;
     wire zero;
-    ALU ALU0 (readData1, muxOut1, operation, ALUOut, zero);
+    ALU ALU (readData1, muxOut1, operation, ALUOut, zero);
 
     wire [31:0] memOut;
-    DataMemory DataMemory0 (clk, memRead, memWrite, ALUOut, readData2, memOut);
+    DataMemory DataMemory (clk, memRead, memWrite, ALUOut, readData2, memOut);
 
     wire [31:0] muxOut2;
     Mux32x2to1 Mux2 (ALUOut, memOut, memToReg, muxOut2);
@@ -74,10 +75,10 @@ module MIPSCicloUnico(input wire clk, input wire rst);
     Add4 Add40 (PCValue, PCPlus4);
 
     wire [31:0] shiftOut;
-    ShiftLeft2 ShiftLeft20 (ext, shiftOut);
+    ShiftLeft2 ShiftLeft2 (ext, shiftOut);
 
     wire [31:0] adderOut;
-    Adder Adder0 (shiftOut, PCPlus4, adderOut);
+    Adder Adder (shiftOut, PCPlus4, adderOut);
 
     wire andOut;
     and (andOut, branch, zero);
@@ -91,4 +92,12 @@ module MIPSCicloUnico(input wire clk, input wire rst);
 
     wire [31:0] muxOut4;
     Mux32x2to1 Mux4 (muxOut3, jumpAdress, jump, muxOut4);
+
+    // Seção para jal
+    // $31(11111) é o $ra
+    wire muxOut5;
+    Mux5x2to1 Mux5 (muxOut0, 5'b11111, link, muxOut5);
+    
+    wire muxOut6;
+    Mux32x2to1 Mux6 (muxOut3, PCPlus4, link, muxOut6);
 endmodule

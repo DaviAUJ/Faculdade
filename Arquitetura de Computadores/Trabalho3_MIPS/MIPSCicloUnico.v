@@ -16,7 +16,7 @@ module MIPSCicloUnico(input wire clk, input wire rst);
     // Todo o datapath daqui para baixo
     // Para a instrução jump vai ter uma seção específica
     wire [31:0] PCValue;
-    ProgramCounter PC (clk, rst, muxOut4, PCValue);
+    ProgramCounter PC (clk, rst, muxOut7, PCValue);
 
     wire [31:0] instruction;
     InstructionMem InstructionMem (PCValue, instruction);
@@ -38,16 +38,17 @@ module MIPSCicloUnico(input wire clk, input wire rst);
     );
 
     wire [4:0] muxOut0;
-    Mux5x2to1 Mux (instruction[20:16], instruction[15:11], regDst, muxOut0);
+    Mux5x2to1 Mux0 (instruction[20:16], instruction[15:11], regDst, muxOut0);
 
     wire [31:0] readData1, readData2;
     Registers Registers (
         clk,
+        rst,
         instruction[25:21],
         instruction[20:16],
         muxOut5,
         regWrite,
-        muxOut2,
+        muxOut6,
         readData1,
         readData2
     );
@@ -56,7 +57,8 @@ module MIPSCicloUnico(input wire clk, input wire rst);
     SignalExtend SignalExtend (instruction[15:0], ext);
 
     wire [3:0] operation;
-    ALUControl ALUControl (ALUOp, instruction[5:0], operation);
+    wire jrEnable;
+    ALUControl ALUControl (ALUOp, instruction[5:0], operation, jrEnable);
 
     wire [31:0] muxOut1;
     Mux32x2to1 Mux1 (readData2, ext, ALUSrc, muxOut1);
@@ -99,5 +101,9 @@ module MIPSCicloUnico(input wire clk, input wire rst);
     Mux5x2to1 Mux5 (muxOut0, 5'b11111, link, muxOut5);
     
     wire muxOut6;
-    Mux32x2to1 Mux6 (muxOut3, PCPlus4, link, muxOut6);
+    Mux32x2to1 Mux6 (muxOut2, PCPlus4, link, muxOut6);
+
+    // Seção para o jr
+    wire muxOut7;
+    Mux32x2to1 Mux7 (muxOut2, muxOut4, jrEnable, muxOut7);
 endmodule

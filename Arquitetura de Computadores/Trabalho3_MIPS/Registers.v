@@ -1,5 +1,6 @@
 module Registers(
     input wire clk,
+    input wire rst,
     input wire [4:0] readReg1, readReg2, writeReg,
     input wire writeEnable,
     input wire [31:0] writeData,
@@ -8,7 +9,7 @@ module Registers(
     reg [31:0] registers [31:0];
 
     integer i;
-    initial begin  
+    always @(posedge rst) begin
         for(i = 0; i < 32; i = i + 1) begin
             registers[i] = 32'b0;
         end

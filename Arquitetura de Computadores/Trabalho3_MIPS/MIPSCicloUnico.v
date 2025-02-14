@@ -1,17 +1,3 @@
-`include "InstructionMem.v"
-`include "MainControl.v"
-`include "Registers.v"
-`include "Mux5x2to1.v"
-`include "SignalExtend.v"
-`include "ALUControl.v"
-`include "Mux32x2to1.v"
-`include "ALU.v"
-`include "DataMemory.v"
-`include "Add4.v"
-`include "ShiftLeft2.v"
-`include "Adder.v"
-`include "ProgramCounter.v"
-
 module MIPSCicloUnico(input wire clk, input wire rst);
     // Todo o datapath daqui para baixo
     // Para a instrução jump vai ter uma seção específica
@@ -74,7 +60,7 @@ module MIPSCicloUnico(input wire clk, input wire rst);
     Mux32x2to1 Mux2 (ALUOut, memOut, memToReg, muxOut2);
 
     wire [31:0] PCPlus4;
-    Add4 Add40 (PCValue, PCPlus4);
+    Add4 Add4 (PCValue, PCPlus4);
 
     wire [31:0] shiftOut;
     ShiftLeft2 ShiftLeft2 (ext, shiftOut);
@@ -97,13 +83,13 @@ module MIPSCicloUnico(input wire clk, input wire rst);
 
     // Seção para jal
     // $31(11111) é o $ra
-    wire muxOut5;
+    wire [4:0] muxOut5;
     Mux5x2to1 Mux5 (muxOut0, 5'b11111, link, muxOut5);
     
-    wire muxOut6;
+    wire [31:0] muxOut6;
     Mux32x2to1 Mux6 (muxOut2, PCPlus4, link, muxOut6);
 
     // Seção para o jr
-    wire muxOut7;
-    Mux32x2to1 Mux7 (muxOut2, muxOut4, jrEnable, muxOut7);
+    wire [31:0] muxOut7;
+    Mux32x2to1 Mux7 (muxOut4, muxOut2, jrEnable, muxOut7);
 endmodule

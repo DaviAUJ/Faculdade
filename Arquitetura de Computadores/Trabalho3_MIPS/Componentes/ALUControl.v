@@ -13,6 +13,7 @@ module ALUControl(input wire [1:0] ALUOp, input wire [5:0] instruction, output r
                     4'b10: operation = 4'b110; // -
                     4'b100: operation = 4'b0; // AND
                     4'b101: operation = 4'b1; // OR
+                    4'b111: operation = 4'b1100; // NOR
                     4'b1000: begin 
                         operation = 4'b10; // +
                         jrEnable = 1'b1;

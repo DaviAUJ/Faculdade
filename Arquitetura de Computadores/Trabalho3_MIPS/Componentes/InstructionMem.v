@@ -8,7 +8,7 @@ module InstructionMem(input wire [31:0] address, output wire [31:0] instruction)
             instructions[i] = 32'b0;
         end
 
-        $readmemb("codigo.mem", instructions, 0, 255);
+        $readmemb("./Codigos/codigo.mem", instructions, 0, 255);
     end
 
     assign instruction = instructions[address[9:2]];

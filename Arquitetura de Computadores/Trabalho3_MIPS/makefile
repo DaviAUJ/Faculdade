@@ -1,22 +1,29 @@
-IVERILOG = iverilog
-VVP = vvp
-GTKWAVE = gtkwave
-TB = testbench.v
-VVPFILE = testbench.vvp
-VCD = testbench.vcd
+# [windows, linux]
+SYS = windows
 
-.PHONY: all sim run view clean
+MAIN = MIPSCicloUnico.v
+TB = Testbench/testbench.v
+COMPONENTS = $(wildcard Componentes/*.v)
 
-all: sim run view clean
+VVP = saida.vvp
+VCD = saida.vcd
 
-sim: $(TB)
-		$(IVERILOG) -o $(VVPFILE) $(TB)
+.PHONY: all compile run analyze clean
 
-run: $(VVPFILE)
-		$(VVP) $(VVPFILE)
+all: compile run analyze clean
 
-view: $(VCD)
-		$(GTKWAVE) $(VCD)
+compile: $(MAIN) $(TB) $(COMPONENTS)
+	iverilog -o $(VVP) $^
 
-clean:
-		rm -f $(VVPFILE) $(VCD)
+run: $(VVP)
+	vvp $<
+
+analyze: $(VCD)
+	gtkwave $<
+
+clean: $(VVP) $(VCD)
+ifeq ($(SYS), windows)
+	del $^
+else
+	rm -f $^
+endif

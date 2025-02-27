@@ -5,7 +5,7 @@ COMPILADOR = gcc
 
 NOME = davinascimento
 MATRICULA = 202300027801
-PROJETO = quicksort
+PROJETO = compressao
 EXTENSAO = .c
 
 # Deixe vazia se o make estiver no mesmo diretório

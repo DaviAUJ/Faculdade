@@ -1,5 +1,5 @@
 # [windows, linux]
-SYS = windows
+SYS = linux
 
 MAIN = MIPSCicloUnico.v
 TB = Testbench/testbench.v

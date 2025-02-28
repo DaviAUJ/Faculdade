@@ -21,7 +21,7 @@ CODIGO = $(PASTA)$(NOME)_$(MATRICULA)_$(PROJETO)$(EXTENSAO)
 
 .PHONY: all compile run clean diff
 
-all: compile run clean diff
+all: compile run clean
 
 compile: $(CODIGO)
 	$(COMPILADOR) -Wall $(CODIGO) -o $(EXE).exe

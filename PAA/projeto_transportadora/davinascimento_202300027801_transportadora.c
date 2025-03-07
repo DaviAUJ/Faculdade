@@ -79,7 +79,8 @@ int main(int argc, char** argv) {
     PINT(maiorVolume);
     PINT(maiorCarga);
     tabela_t tabela[maiorVolume][maiorCarga][numPacotes];
-    return 0;
+    A;
+
     
     for(int32_t i = 0; i <= maiorVolume; i++) {
         for(int32_t j = 0; j <= maiorCarga; j++) {

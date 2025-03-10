@@ -5,22 +5,24 @@
 
 
 
-#define TAMDNA 31
+#define TAMDNA 40001
 #define TAMGENE 1001
 
+#define TESTE printf("TESTE\n")
 #define PSTRING(var) printf("%s\n", var)
 #define PINT(var) printf("%d\n", var)
+#define PFLOAT(var) printf("%f\n", var)
 
 #define PEGARINT(var) fscanf(arqEntrada, "%d ", &var)
-#define PEGARDNA(ptr) fscanf(arqEntrada, "%30s ", ptr)
+#define PEGARDNA(ptr) fscanf(arqEntrada, "%40000s  ", ptr)
 #define PEGARGENE(ptr) fscanf(arqEntrada, "%1000s ", ptr)
-#define PFRESULTADO(var) fscanf(arqSaida, "%s->%d%%\n", var.nome, (int32_t)roundf(var.chance))
+#define PFRESULTADO(var) fprintf(arqSaida, "%s->%d%%\n", var.nome, var.chance)
 
 
 
 typedef struct resultado {
     char nome[TAMGENE];
-    float chance;
+    int32_t chance;
 } resultado_t;
 
 FILE* arqEntrada;
@@ -83,10 +85,6 @@ void mergeSort(resultado_t* vetor, int32_t inicio, int32_t fim) {
     }
 }
 
-bool kmp(char* encontrar, int32_t inicio, int32_t fim) {
-
-}
-
 int main(int argc, char** argv) {
     int32_t subcadeia;
     int32_t numDoencas;
@@ -98,43 +96,68 @@ int main(int argc, char** argv) {
     
     resultado_t tabela[numDoencas];
 
-    for(int32_t i_Doencas; i_Doencas < numDoencas; i_Doencas++) {
+    for(int32_t i_Doencas = 0; i_Doencas < numDoencas; i_Doencas++) {
         resultado_t resultado;
         int32_t numGenes;
         float parcela;
+        float chance = 1;
         
         PEGARGENE(resultado.nome);
-        resultado.chance = 1;
         PEGARINT(numGenes);
         parcela = 1 / (float) numGenes;
         
         for(int32_t i_Gene = 0; i_Gene < numGenes; i_Gene++) {
             char gene[TAMGENE];
-            int32_t subcadeiasValidas;
-            int32_t i_Subcadeia = 0;
+            int32_t i_CharGene = 0;
+            int32_t i_CharDNA = 0;
+            int32_t sequencia = 0;
+            int32_t encontrados = 0;
             int32_t limite;
             
             PEGARGENE(gene);
             
-            while(gene[i_Subcadeia] != '\0') {
-                i_Subcadeia++;
+            while(gene[i_CharGene] != '\0') {
+                i_CharGene++;
             }
+
+            limite = (int32_t) ceilf(i_CharGene * 0.9f);
             
-            subcadeiasValidas = i_Subcadeia;
-            limite = (int32_t) ceilf(i_Subcadeia * 0.9f);
-            
-            i_Subcadeia = 0;
-            while(gene[i_Subcadeia] != '\0') {
-                if(!kmp(gene, i_Subcadeia, i_Subcadeia + subcadeia - 1)) {
-                    subcadeiasValidas--;
-                    resultado.chance -= subcadeiasValidas >= limite ? 0 : parcela;
-                    break;
+            i_CharGene = 0;
+            while(gene[i_CharGene] != '\0') {
+                if(gene[i_CharGene] == DNA[i_CharDNA]) {
+                    i_CharGene++;
+                    sequencia++;
+                }
+                else {
+                    if(sequencia >= subcadeia) {
+                        encontrados += sequencia;
+                        i_CharDNA--;
+                    }
+                    else {
+                        i_CharGene -= sequencia;
+                        i_CharDNA -= sequencia;
+                    }
+
+                    sequencia = 0;
+
+                    if(encontrados >= limite) {
+                        break;
+                    }
+
+                    if(TAMDNA - (i_CharDNA + 2) + encontrados < limite) {
+                        encontrados = 0;
+                        break;
+                    }
                 }
                 
-                i_Subcadeia++;
+                i_CharDNA++;
             }
+
+            encontrados += sequencia >= subcadeia ? sequencia : 0;
+            chance -= encontrados < limite ? parcela : 0;
         }
         
+        resultado.chance = (int32_t)roundf(chance * 100);
         tabela[i_Doencas] = resultado;
     }
     

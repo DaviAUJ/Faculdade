@@ -7,9 +7,10 @@
 #define SET_BIT(arr, bit) (arr[(bit) / 8] |= (1 << (7 - (bit) % 8)))
 #define CHECK_BIT(arr, bit) ((arr[(bit) / 8] & (1 << (7 - (bit) % 8))) ? 1 : 0)
 #define CLEAR_BIT(arr, bit) (arr[(bit) / 8] &= ~(1 << (7 - (bit) % 8)))
+#define PEGARPROXTAM(var) fscanf(arqEntrada, "%hu ", &var)
+#define PEGARPROXHEX(var) fscanf(arqEntrada, "%hhX ", &var)
 
-FILE* arqEntrada;
-FILE* arqSaida;
+
 
 typedef struct frequencia {
     uint8_t caracter;
@@ -31,40 +32,23 @@ typedef struct string {
     uint16_t tamanho;
 } st_String;
 
-st_String criarString(int16_t tamanho) {
-    st_String saida;
 
-    saida.string = (uint8_t*) malloc(sizeof(uint8_t) * (tamanho + 1));
-    saida.string[tamanho] = '\0';
-    saida.tamanho = tamanho;
 
-    return saida;
-}
+FILE* arqEntrada;
+FILE* arqSaida;
 
-uint16_t pegarProxTam() {
-    uint16_t saida;
 
-    fscanf(arqEntrada, "%hu ", &saida);
-
-    return saida;
-}
-
-uint8_t pegarProxHex() {
-    uint32_t saida;
-
-    fscanf(arqEntrada, "%X ", &saida);
-
-    return (uint8_t)saida;
-}
 
 st_String pegarLinha() {
     st_String saida;
-    uint16_t tamanho = pegarProxTam();
 
-    saida = criarString(tamanho);
+    PEGARPROXTAM(saida.tamanho);
 
-    for(uint16_t a = 0; a < tamanho; a++) {
-        saida.string[a] = pegarProxHex();
+    saida.string = (uint8_t*) malloc(sizeof(uint8_t) * (saida.tamanho + 1));
+    saida.string[saida.tamanho] = '\0';
+
+    for(uint16_t a = 0; a < saida.tamanho; a++) {
+        PEGARPROXHEX(saida.string[a]);
     }
 
     return saida;
@@ -180,8 +164,7 @@ void liberarArvore(st_Frequencia* raiz) {
 }
 
 st_String RLE(st_String string) {
-    uint8_t* stringComprimida = (uint8_t*) malloc(sizeof(uint8_t) * (string.tamanho + 1) * 2);
-    stringComprimida[string.tamanho] = '\0';
+    uint8_t* stringComprimida = (uint8_t*) malloc(sizeof(uint8_t) * string.tamanho * 2 + 1);
 
     uint16_t indexCompressao = 0;
     uint8_t repeticoes = 1;
@@ -202,7 +185,6 @@ st_String RLE(st_String string) {
 
     st_String saida;
     saida.tamanho = indexCompressao;
-    stringComprimida = realloc(stringComprimida, sizeof(uint8_t) * (saida.tamanho + 1));
     stringComprimida[saida.tamanho] = '\0';
     saida.string = stringComprimida;
 

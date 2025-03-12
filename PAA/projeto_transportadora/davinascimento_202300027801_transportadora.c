@@ -42,6 +42,8 @@ typedef struct encadeado {
 
 typedef struct tabela {
     float valor;
+    float peso;
+    float volume;
     encadeado_t* inicio;
     encadeado_t* fim;
     bool disponivel;
@@ -90,6 +92,8 @@ int main(int argc, char** argv) {
     for(int32_t i = 0; i < maiorVolume; i++) {
         for(int32_t j = 0; j < maiorCarga; j++) {
             ACCESS(0, j, i).valor = 0;
+            ACCESS(0, j, i).peso = 0;
+            ACCESS(0, j, i).volume = 0;
             ACCESS(0, j, i).inicio = NULL;
             ACCESS(0, j, i).fim = NULL;
             ACCESS(0, j, i).disponivel = false;
@@ -99,6 +103,8 @@ int main(int argc, char** argv) {
     for(int32_t i = 0; i < numPacotes; i++) {
         for(int32_t j = 0; j < maiorCarga; j++) {
             ACCESS(i, j, 0).valor = 0;
+            ACCESS(i, j, 0).peso = 0;
+            ACCESS(i, j, 0).volume = 0;
             ACCESS(i, j, 0).inicio = NULL;
             ACCESS(i, j, 0).fim = NULL;
             ACCESS(i, j, 0).disponivel = false;
@@ -108,6 +114,8 @@ int main(int argc, char** argv) {
     for(int32_t i = 0; i < numPacotes; i++) {
         for(int32_t j = 0; j < maiorVolume; j++) {
             ACCESS(i, 0, j).valor = 0;
+            ACCESS(i, 0, j).peso = 0;
+            ACCESS(i, 0, j).volume = 0;
             ACCESS(i, 0, j).inicio = NULL;
             ACCESS(i, 0, j).fim = NULL;
             ACCESS(i, 0, j).disponivel = false;
@@ -130,6 +138,9 @@ int main(int argc, char** argv) {
                         entrada = a;
                     }
                     else {
+                        b.peso += pacotes[i_Id].peso;
+                        b.volume += pacotes[i_Id].volume;
+
                         entrada = b;
                         entrada.inicio = (encadeado_t*) malloc(sizeof(encadeado_t));
                         entrada.inicio->pacote = &pacotes[i_Id];
@@ -144,8 +155,47 @@ int main(int argc, char** argv) {
         }
     }
     
-
     arqSaida = fopen(argv[2], "w");
+
+    for(int32_t i_caminhao = 0; i_caminhao < numCaminhoes; i_caminhao++) {
+        for(int32_t i_pacotes = numPacotes - 1; i_pacotes >= 0; i_pacotes--) {
+            caminhao_t caminhao = caminhoes[i_caminhao];
+            tabela_t* item = &ACCESS(i_pacotes, caminhao.cargaMax, caminhao.volumeMax);
+
+            if(item->disponivel) {
+                pacote_t* ptr = item->inicio;
+                while(ptr != NULL) {
+                    if(!ptr->disponivel) {
+                        item->disponivel = false;
+                    }
+                }
+
+                item->disponivel = false;
+
+                fprintf(arqSaida, "[%s]R$%.2f,%.0fKG(%d%%),%.0fL(%d%%)->\n",
+                    caminhao.placa, 
+                    item->valor, 
+                    item->peso, 
+                    (int32_t) roundf(item->peso / caminhao.cargaMax), 
+                    item->volume,
+                    (int32_t) roundf(item->volume / caminhao.volumeMax)
+                );
+                
+                fseek(arqSaida, -1, SEEK_CUR);
+
+                ptr = item->inicio;
+                while(ptr != item->fim) {
+                    fprintf(arqSaida, ",%s", ptr->codigo);
+                    fseek(arqSaida, -TAMCODIGO + 1, SEEK_CUR);
+                    ptr->disponivel = false;
+                }
+
+                fprintf(arqSaida, "%s", ptr->codigo);
+                ptr->disponivel = false;
+            }
+        }
+    }
+
 
     fclose(arqSaida);
     

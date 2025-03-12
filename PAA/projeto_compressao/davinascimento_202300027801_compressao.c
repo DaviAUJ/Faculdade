@@ -135,26 +135,6 @@ void inserirHeap(st_Frequencia** heap, int16_t* fim, st_Frequencia* inserir) {
     }
 }
 
-int16_t empurrarZeros(st_Frequencia** vetor, st_Tabela* tabela, int16_t fim) {
-    int16_t prox = 0;
-
-    for(int16_t f = 0; f <= fim; f++) {
-        if(vetor[f]->frequencia != 0) {
-            trocar(&vetor[f], &vetor[prox]);
-
-            prox++;
-        }
-    }
-
-    for(int16_t f = prox; f <= fim; f++) {
-        tabela[vetor[f]->caracter].no = NULL;
-        free(vetor[f]);
-        vetor[f] = NULL;
-    }
-
-    return prox - 1;
-}
-
 void liberarArvore(st_Frequencia* raiz) {
     if(raiz != NULL) {
         liberarArvore(raiz->filhoEsq);
@@ -171,7 +151,7 @@ st_String RLE(st_String string) {
     uint8_t referencia = string.string[0];
 
     for(uint16_t b = 1; b < string.tamanho + 1; b++) {
-        if(string.string[b] == referencia && repeticoes < UINT8_MAX) {
+        if(string.string[b] == referencia && repeticoes <= UINT8_MAX) {
             repeticoes++;
         }
         else {
@@ -192,31 +172,32 @@ st_String RLE(st_String string) {
 }
 
 st_String huffman(st_String string) {
-    int16_t fim = UINT8_MAX;
-    st_Frequencia* frequencias[UINT8_MAX + 1];
-    st_Tabela tabela[UINT8_MAX + 1];
+    int32_t frequencias[256] = {0};
+    st_Frequencia* fila[256];
+    st_Tabela tabela[256];
     st_String saida;
     
-    for(int16_t d = 0; d <= fim; d++) {
-        frequencias[d] = (st_Frequencia*) malloc(sizeof(st_Frequencia));
-        frequencias[d]->caracter = d;
-        frequencias[d]->frequencia = 0;
-        frequencias[d]->filhoEsq = NULL;
-        frequencias[d]->filhoDir = NULL;
-        frequencias[d]->parente = NULL;
-        
-        tabela[d].no = frequencias[d];
-    }
-
     for(int16_t e = 0; e < string.tamanho; e++) {
-        frequencias[string.string[e]]->frequencia++;
+        frequencias[string.string[e]]++;
     }
+    
+    int16_t fim = -1;
+    for(int16_t i = 0; i <= 255; i++) {
+        if(frequencias[i]) {
+            st_Frequencia* inserir = (st_Frequencia*) malloc(sizeof(st_Frequencia));
+            inserir->caracter = i;
+            inserir->filhoDir = NULL;
+            inserir->filhoEsq = NULL;
+            inserir->frequencia = frequencias[i];
+            inserir->parente = NULL;
 
-    fim = empurrarZeros(frequencias, tabela, fim);
+            inserirHeap(fila, &fim, inserir);
 
-    st_Frequencia* fila[fim + 1];
-    for(int16_t i = -1; i < fim;) {
-        inserirHeap(fila, &i, frequencias[i + 1]);
+            tabela[i].no = inserir;
+        }
+        else {
+            tabela[i].no = NULL;
+        }
     }
 
     st_Frequencia* raiz = fila[0]; 
@@ -307,7 +288,6 @@ int main(int argc, char** argv) {
 
     uint32_t linhas;
     fscanf(arqEntrada, "%d ", &linhas);
-    linhas = (int) (linhas * 0.8);
 
     for(int l = 0; l < linhas; l++) {
         st_String original = pegarLinha();

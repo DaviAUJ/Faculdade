@@ -58,24 +58,29 @@ void printarLinha(st_String rle, st_String huffman, uint16_t tamanhoOriginal) {
     static uint32_t linhasPrintadas = 0;
 
     if(huffman.tamanho <= rle.tamanho) {
-        fprintf(arqSaida, "%u->HUF(%.2f%%)=", linhasPrintadas, huffman.tamanho * 100 / (float)tamanhoOriginal);
+        char buffer[huffman.tamanho * 2 + 100];
+        char* at = buffer;
+        at += sprintf(at, "%u->HUF(%.2f%%)=", linhasPrintadas, huffman.tamanho * 100 / (float)tamanhoOriginal);
 
         for(uint16_t k = 0; k < huffman.tamanho; k++) {
-            fprintf(arqSaida, "%02X", huffman.string[k]);
+            at += sprintf(at, "%02X", huffman.string[k]);
         }
-
-        fprintf(arqSaida, "\n");
+        
+        fprintf(arqSaida, "%s\n", buffer);
     }
 
     if(huffman.tamanho >= rle.tamanho) {
-        fprintf(arqSaida, "%u->RLE(%.2f%%)=", linhasPrintadas, rle.tamanho * 100 / (float)tamanhoOriginal);
+        char buffer[rle.tamanho * 2 + 100];
+        char* at = buffer;
+        at += sprintf(at, "%u->RLE(%.2f%%)=", linhasPrintadas, rle.tamanho * 100 / (float)tamanhoOriginal);
 
         for(uint16_t k = 0; k < rle.tamanho; k++) {
-            fprintf(arqSaida, "%02X", rle.string[k]);
+            at += sprintf(at, "%02X", rle.string[k]);
         }
-
-        fprintf(arqSaida, "\n");
+    
+        fprintf(arqSaida, "%s\n", buffer);
     }
+    
 
     linhasPrintadas++;
 
@@ -250,13 +255,7 @@ st_String huffman(st_String string) {
         tamanhoBits += tabela[string.string[i]].numShifts;
     }
 
-    if(tamanhoBits % 8) {
-        saida.tamanho = tamanhoBits / 8 + 1;
-        
-    }
-    else {
-        saida.tamanho = tamanhoBits / 8;
-    }
+    saida.tamanho = tamanhoBits / 8 + (tamanhoBits % 8 ? 1 : 0);
 
     saida.string = (uint8_t*)calloc(saida.tamanho + 1, sizeof(uint8_t));
 

@@ -29,6 +29,8 @@ FILE* arqEntrada;
 FILE* arqSaida;
 char DNA[TAMDNA];
 
+
+
 static inline void merge(resultado_t* vetor, int32_t inicio, int32_t meio, int32_t fim) {
     int32_t i, j, k;
     int32_t n1 = meio - inicio + 1;

@@ -36,6 +36,7 @@ typedef struct string {
 
 FILE* arqEntrada;
 FILE* arqSaida;
+char bufferSaida[10000000];
 
 
 
@@ -52,40 +53,6 @@ st_String pegarLinha() {
     }
 
     return saida;
-}
-
-void printarLinha(st_String rle, st_String huffman, uint16_t tamanhoOriginal) {
-    static uint32_t linhasPrintadas = 0;
-
-    if(huffman.tamanho <= rle.tamanho) {
-        char buffer[huffman.tamanho * 2 + 100];
-        char* at = buffer;
-        at += sprintf(at, "%u->HUF(%.2f%%)=", linhasPrintadas, huffman.tamanho * 100 / (float)tamanhoOriginal);
-
-        for(uint16_t k = 0; k < huffman.tamanho; k++) {
-            at += sprintf(at, "%02X", huffman.string[k]);
-        }
-        
-        fprintf(arqSaida, "%s\n", buffer);
-    }
-
-    if(huffman.tamanho >= rle.tamanho) {
-        char buffer[rle.tamanho * 2 + 100];
-        char* at = buffer;
-        at += sprintf(at, "%u->RLE(%.2f%%)=", linhasPrintadas, rle.tamanho * 100 / (float)tamanhoOriginal);
-
-        for(uint16_t k = 0; k < rle.tamanho; k++) {
-            at += sprintf(at, "%02X", rle.string[k]);
-        }
-    
-        fprintf(arqSaida, "%s\n", buffer);
-    }
-    
-
-    linhasPrintadas++;
-
-    free(rle.string);
-    free(huffman.string);
 }
 
 void trocar(st_Frequencia** var1, st_Frequencia** var2) {
@@ -176,7 +143,7 @@ st_String RLE(st_String string) {
     return saida;
 }
 
-st_String huffman(st_String string) {
+st_String Huffman(st_String string) {
     int32_t frequencias[256] = {0};
     st_Frequencia* fila[256];
     st_Tabela tabela[256];
@@ -282,19 +249,52 @@ st_String huffman(st_String string) {
 }
 
 int main(int argc, char** argv) {
-    arqEntrada = fopen(argv[1], "r");
-    arqSaida = fopen(argv[2], "w");
+    printf("!");
 
     uint32_t linhas;
-    fscanf(arqEntrada, "%d ", &linhas);
+    char* at = bufferSaida;
 
-    for(int l = 0; l < linhas; l++) {
+    arqEntrada = fopen(argv[1], "r");
+    
+    fscanf(arqEntrada, "%d ", &linhas);
+    linhas = (uint32_t)(linhas * 0.9) + 1;
+    
+    for(uint32_t l = 0; l < linhas; l++) {
         st_String original = pegarLinha();
-        printarLinha(RLE(original), huffman(original), original.tamanho);
+        st_String rle = RLE(original);
+        st_String huffman = Huffman(original);
+
+        if(huffman.tamanho <= rle.tamanho) {
+            at += sprintf(at, "%u->HUF(%.2f%%)=", l, huffman.tamanho * 100 / (float)original.tamanho);
+    
+            for(uint16_t k = 0; k < huffman.tamanho; k++) {
+                at += sprintf(at, "%02X", huffman.string[k]);
+            }
+            
+            at += sprintf(at, "\n");
+        }
+    
+        if(huffman.tamanho >= rle.tamanho) {
+            at += sprintf(at, "%u->RLE(%.2f%%)=", l, rle.tamanho * 100 / (float)original.tamanho);
+    
+            for(uint16_t k = 0; k < rle.tamanho; k++) {
+                at += sprintf(at, "%02X", rle.string[k]);
+            }
+    
+            at += sprintf(at, "\n");
+        }
+
         free(original.string);
+        free(rle.string);
+        free(huffman.string);
     }
 
     fclose(arqEntrada);
+    
+    arqSaida = fopen(argv[2], "w");
+
+    fprintf(arqSaida, "%s", bufferSaida);
+
     fclose(arqSaida);
 
     return 0;

@@ -16,8 +16,8 @@
 #define PEGARCAMINHAO(var) fscanf(arqEntrada, "%s %d %d ", var.placa, &var.cargaMax, &var.volumeMax)
 #define PEGARPACOTE(var) fscanf(arqEntrada, "%s %f %f %f ", var.codigo, &var.valor, &var.peso, &var.volume)
 #define PEGARINT(var) fscanf(arqEntrada, "%d ", &var)
-#define MAX(val1, val2) val1 > val2 ? val1 : val2
-#define ACCESS(x, y, z) tabela[x + y * numPacotes + z * numCaminhoes * maiorCarga]
+#define MAX(val1, val2) val1 >= val2 ? val1 : val2
+#define ACCESS(x, y, z) tabela[(x) + (y) * numPacotes + (z) * numPacotes * maiorCarga]
 
 
 
@@ -35,29 +35,16 @@ typedef struct pacote {
     bool disponivel;
 } pacote_t;
 
-typedef struct encadeado {
-    pacote_t* pacote;
-    struct encadeado* proximo;
-} encadeado_t;
-
-typedef struct tabela {
-    float valor;
-    float peso;
-    float volume;
-    encadeado_t* inicio;
-    encadeado_t* fim;
-    bool disponivel;
-} tabela_t;
-
 
 
 FILE* arqEntrada;
 FILE* arqSaida;
-tabela_t* tabela;
+float* tabela;
 int32_t maiorCarga;
 int32_t maiorVolume;
 int32_t numCaminhoes;
 int32_t numPacotes;
+char bufferSaida[1000000];
 
 
 
@@ -87,42 +74,27 @@ int main(int argc, char** argv) {
     
     fclose(arqEntrada);
 
-    tabela = (tabela_t*)malloc(sizeof(tabela_t) * maiorCarga * maiorVolume * numPacotes);
+    tabela = (float*)malloc(sizeof(float) * maiorCarga * maiorVolume * numPacotes);
 
     for(int32_t i = 0; i < maiorVolume; i++) {
         for(int32_t j = 0; j < maiorCarga; j++) {
-            ACCESS(0, j, i).valor = 0;
-            ACCESS(0, j, i).peso = 0;
-            ACCESS(0, j, i).volume = 0;
-            ACCESS(0, j, i).inicio = NULL;
-            ACCESS(0, j, i).fim = NULL;
-            ACCESS(0, j, i).disponivel = false;
+            ACCESS(0, j, i) = 0;
         }
     }
 
     for(int32_t i = 0; i < numPacotes; i++) {
         for(int32_t j = 0; j < maiorCarga; j++) {
-            ACCESS(i, j, 0).valor = 0;
-            ACCESS(i, j, 0).peso = 0;
-            ACCESS(i, j, 0).volume = 0;
-            ACCESS(i, j, 0).inicio = NULL;
-            ACCESS(i, j, 0).fim = NULL;
-            ACCESS(i, j, 0).disponivel = false;
+            ACCESS(i, j, 0) = 0;
         }
     }
 
     for(int32_t i = 0; i < numPacotes; i++) {
         for(int32_t j = 0; j < maiorVolume; j++) {
-            ACCESS(i, 0, j).valor = 0;
-            ACCESS(i, 0, j).peso = 0;
-            ACCESS(i, 0, j).volume = 0;
-            ACCESS(i, 0, j).inicio = NULL;
-            ACCESS(i, 0, j).fim = NULL;
-            ACCESS(i, 0, j).disponivel = false;
+            ACCESS(i, 0, j) = 0;
         }
     }
     
-    tabela_t entrada;
+    float entrada;
     for(int32_t i_Id = 1; i_Id < numPacotes; i_Id++) {
         for(int32_t i_Peso = 1; i_Peso < maiorCarga; i_Peso++) {
             for(int32_t i_Volume = 1; i_Volume < maiorVolume; i_Volume++) {
@@ -130,26 +102,13 @@ int main(int argc, char** argv) {
                     entrada = ACCESS(i_Id - 1, i_Peso, i_Volume);
                 }
                 else {
-                    tabela_t a = ACCESS(i_Id - 1, i_Peso, i_Volume);
-                    tabela_t b = ACCESS(i_Id - 1, (int) ceilf(i_Peso - pacotes[i_Id].peso), (int) ceilf(i_Volume - pacotes[i_Id].volume));
-                    b.valor += pacotes[i_Id].valor;
+                    float a = ACCESS(i_Id - 1, i_Peso, i_Volume);
+                    float b = ACCESS(i_Id - 1, (int) ceilf(i_Peso - pacotes[i_Id].peso), (int) ceilf(i_Volume - pacotes[i_Id].volume));
+                    b += pacotes[i_Id].valor;
 
-                    if(a.valor >= b.valor) {
-                        entrada = a;
-                    }
-                    else {
-                        b.peso += pacotes[i_Id].peso;
-                        b.volume += pacotes[i_Id].volume;
-
-                        entrada = b;
-                        entrada.inicio = (encadeado_t*) malloc(sizeof(encadeado_t));
-                        entrada.inicio->pacote = &pacotes[i_Id];
-                        entrada.inicio->proximo = b.inicio;
-                        entrada.fim = b.fim;
-                    }
+                    entrada = MAX(a, b);
                 }
                 
-                entrada.disponivel = true;
                 ACCESS(i_Id, i_Peso, i_Volume) = entrada;
             }
         }
@@ -157,43 +116,75 @@ int main(int argc, char** argv) {
     
     arqSaida = fopen(argv[2], "w");
 
+    int32_t ultimoPacote = numPacotes - 1;
     for(int32_t i_caminhao = 0; i_caminhao < numCaminhoes; i_caminhao++) {
-        for(int32_t i_pacotes = numPacotes - 1; i_pacotes >= 0; i_pacotes--) {
-            caminhao_t caminhao = caminhoes[i_caminhao];
-            tabela_t* item = &ACCESS(i_pacotes, caminhao.cargaMax, caminhao.volumeMax);
+        int32_t encaminhados[100];
+        int32_t numEncaminhados = 0;
+        caminhao_t caminhao = caminhoes[i_caminhao];
+        int32_t i_volume = caminhao.volumeMax;
+        int32_t i_carga = caminhao.cargaMax;
+        int32_t i_pacote;
+        float volumeTotal = 0;
+        float cargaTotal = 0;
+        char* ptr = bufferSaida;
 
-            if(item->disponivel) {
-                pacote_t* ptr = item->inicio;
-                while(ptr != NULL) {
-                    if(!ptr->disponivel) {
-                        item->disponivel = false;
-                    }
+        
+
+        while(ultimoPacote >= 0 && !pacotes[ultimoPacote].disponivel) {
+            ultimoPacote--;
+            i_pacote = ultimoPacote;
+
+            while(i_volume >= 0 && i_carga >= 0 && i_pacote >= 1) {
+                if(ACCESS(i_pacote, i_carga, i_volume) != ACCESS(i_pacote - 1, i_carga, i_volume)) {
+                    i_carga -= (int32_t) ceilf(pacotes[i_pacote].peso);
+                    i_volume -= (int32_t) ceilf(pacotes[i_pacote].volume);
                 }
+    
+                i_pacote--;
 
-                item->disponivel = false;
-
-                fprintf(arqSaida, "[%s]R$%.2f,%.0fKG(%d%%),%.0fL(%d%%)->\n",
-                    caminhao.placa, 
-                    item->valor, 
-                    item->peso, 
-                    (int32_t) roundf(item->peso / caminhao.cargaMax), 
-                    item->volume,
-                    (int32_t) roundf(item->volume / caminhao.volumeMax)
-                );
-                
-                fseek(arqSaida, -1, SEEK_CUR);
-
-                ptr = item->inicio;
-                while(ptr != item->fim) {
-                    fprintf(arqSaida, ",%s", ptr->codigo);
-                    fseek(arqSaida, -TAMCODIGO + 1, SEEK_CUR);
-                    ptr->disponivel = false;
+                if(!pacotes[i_pacote].disponivel) {
+                    pacotes[ultimoPacote].disponivel = false;
+                    break;
                 }
-
-                fprintf(arqSaida, "%s", ptr->codigo);
-                ptr->disponivel = false;
             }
         }
+
+        i_pacote = ultimoPacote;
+
+        while(i_volume >= 0 && i_carga >= 0 && i_pacote >= 1) {
+            if(ACCESS(i_pacote, i_carga, i_volume) != ACCESS(i_pacote - 1, i_carga, i_volume)) {
+                i_carga -= (int32_t) ceilf(pacotes[i_pacote].peso);
+                i_volume -= (int32_t) ceilf(pacotes[i_pacote].volume);
+
+                cargaTotal += pacotes[i_pacote].peso;
+                volumeTotal += pacotes[i_pacote].volume;
+                encaminhados[numEncaminhados++] = i_pacote;
+            }
+
+            i_pacote--;
+        }
+
+        
+
+        ptr += sprintf(ptr, "[%s]R$%.2f,%.0fKG(%.0f%%),%.0f(%.0f%%)->",
+            caminhao.placa,
+            ACCESS(ultimoPacote, caminhao.cargaMax, caminhao.volumeMax),
+            cargaTotal,
+            ceilf(cargaTotal / caminhao.cargaMax * 100),
+            volumeTotal,
+            ceilf(volumeTotal / caminhao.volumeMax * 100)
+        );
+
+        
+
+        while(numEncaminhados - 1) {
+            numEncaminhados--;
+            ptr += sprintf(ptr, "%s,", pacotes[encaminhados[numEncaminhados]].codigo);
+        }
+
+        ptr += sprintf(ptr, "%s\n", pacotes[encaminhados[numEncaminhados]].codigo);
+
+        fprintf(arqSaida, "%s", bufferSaida);
     }
 
 

@@ -5,7 +5,7 @@ COMPILADOR = gcc
 
 NOME = davinascimento
 MATRICULA = 202300027801
-PROJETO = transportadora
+PROJETO = labirinto
 EXTENSAO = .c
 
 # Deixe vazia se o make estiver no mesmo diretório

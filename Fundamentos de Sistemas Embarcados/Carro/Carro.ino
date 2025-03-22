@@ -72,7 +72,7 @@ void startSystem() {
     lcd.print("A/C: ");
 
     // Permite acionar a buzina
-    analogWrite(BUZZERPIN, 200);
+    analogWrite(BUZZERPIN, 20);
 
     carState = 1;
   }

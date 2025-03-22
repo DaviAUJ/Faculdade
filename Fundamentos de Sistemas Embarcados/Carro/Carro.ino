@@ -18,15 +18,16 @@
 */
 
 // Pinos usados
-#define KEYPIN A0
-#define PEDALPIN A1
-#define SMALLLEDPIN 2
-#define HEADLIGHTBUTTONPIN 4
-#define BUZZERPIN 6
-#define BIGLEDPIN 7
-#define ACBUTTONPIN 8
-#define ECHOPIN 12
-#define TRIGPIN 13
+#define KEYPIN A0 // Potenciômetro que simula chave
+#define PEDALPIN A1 // Potenciômetro que controla acelereação do carro
+#define ERRORLEDPIN 0 // Led vermelho de erro
+#define SMALLLEDPIN 2 // Dois leds brancos pequenos que representam farol baixo
+#define HEADLIGHTBUTTONPIN 4 // Botão para troca de estados dos farois
+#define BUZZERPIN 6  // Buzzer que simula uma buzina
+#define BIGLEDPIN 7 // Dois leds brancos que servem para simular farol alto
+#define ACBUTTONPIN 8 // Botão que liga/desliga o Arcondicionado
+#define ECHOPIN 12 // Pino que recebe o sinal de echo do sensor de distância
+#define TRIGPIN 13 // Pino que ativa o sinal de echo do sensor de distância
 
 // Tempo entre cada ciclo do programa
 #define CYCLETIME 10
@@ -34,6 +35,14 @@
 // Demarcadores da posição da chave
 #define SYSTEM 300
 #define ENGINE 900
+
+// Demarcadores de aceleração do pedal
+#define POSACC 400
+#define NEGACC 300
+
+// Limites de velocidade
+#define MAXSPD 100
+#define MINSPD -30
 
 // Instanciando display
 LiquidCrystal_I2C lcd(DISPLAYADDR, DISPLAYCOL, DISPLAYROW);
@@ -43,6 +52,7 @@ bool ACon; // true = ligado, false = desligado
 uint8_t headlightState; // 0 = desligado, 1 = farol baixo, 2 = farol alto
 uint8_t carState; // 0 = desligado, 1 = painel ligado, 2 = painel e motor ligado
 int8_t speed; // Velocidade do carro
+uint16_t showErrorUntil; // Armazena até que o ciclo o led de erro estará aceso 
 int16_t keyValue; // Valor da chave de ignição
 uint32_t cycle; // Contador de ciclos
 float distance; // Distancia de algum objeto do sensor
@@ -112,11 +122,11 @@ void updateSpeed() {
     disabledUntil = cycle + 10; // Desabilitado por 100ms
 
     // Decidindo velocidade
-    if(pedalValue > 400 && speed < 100) {
+    if(pedalValue > POSACC && speed < MAXSPD) {
       speed += (pedalValue - 400) / 160;
       updateDisplaySpeed();
     }
-    else if(pedalValue <= 300 && speed > -30) {
+    else if(pedalValue <= NEGACC && speed > MINSPD) {
       speed += (pedalValue - 200) / 80;
       updateDisplaySpeed();
     }
@@ -128,8 +138,19 @@ void startEngine() {
   // Esta é a unica funcionalidade ativa enquanto o carro está com apenas o painel ligado
   updateHeadlight();
 
+  // Tenta desligar o sistema
+  turnSystemOff();
+
   // Tenta ligar o motor do carro
   if(keyValue >= ENGINE) {
+    // Deixa ligar o motor apenas com potenciômetro de aceleração no neutro
+    int16_t pedalValue = analogRead(PEDALPIN);
+    if(pedalValue > POSACC || pedalValue < NEGACC) {
+      startError(5);
+
+      return;
+    }
+
     // Mostrando os valores
     lcd.setCursor(15, 0);
     lcd.print("0 kmh");
@@ -140,9 +161,6 @@ void startEngine() {
 
     carState = 2;
   }
-
-  // Tenta desligar o sistema
-  turnSystemOff();
 }
 
 // Função responsável por atualizar o campo que mostra o estado atual do farol
@@ -213,17 +231,21 @@ void updateHeadlight() {
 void updateAC() {
   // Armazena o ciclo onde essa função vai poder ser chamada novamente
   static uint32_t disabledUntil = 0;
+  bool ACButton = !digitalRead(ACBUTTONPIN);
 
-  if(disabledUntil < cycle) {
-    bool ACButton = !digitalRead(ACBUTTONPIN);
-
-    if(ACButton) {
+  if(ACButton) {
+    if(disabledUntil < cycle) {
       disabledUntil = cycle + 500; // Desabilitado por 5 segundos
 
       // Inverte e mostra no display a informação correspondente
       ACon = !ACon;
       lcd.setCursor(11, 3);
       ACon ? lcd.print("   Ligado") : lcd.print("Desligado");
+    }
+    else if(disabledUntil - cycle < 400) {
+      // Caso botão tenha sido pressionado e a função ainda estiver desabilitada mostra erro
+      // Tem um periodo onde isso não funciona pois, senão, o led de erro liga mesmo que não era pra ter erro
+      startError(5);
     }
   }
 }
@@ -285,7 +307,14 @@ void turnEngineOff() {
     disabledUntil = cycle + 100; // Desabilitado por 1 segundo
 
     // Só desliga o motor quando estiver parado e a chave na posição certa
-    if(speed == 0 && keyValue < ENGINE) {
+    if(keyValue < ENGINE) {
+      // Mostrar erro se o carro estiver andando
+      if(speed != 0) {
+        startError(100);
+
+        return;
+      }
+
       // Limpa parcialmente o display
       lcd.setCursor(12, 0);
       lcd.print("        ");
@@ -336,12 +365,28 @@ void run() {
   turnEngineOff();
 }
 
+// Função responsável por enviar o sinal de erro para o led dedicado
+// Recebe a duração para versatilidade de aplicação
+void startError(uint8_t duration) {
+  digitalWrite(ERRORLEDPIN, HIGH);
+  showErrorUntil = cycle + duration;
+}
+
+// Função responsável por checar se o led de erro está ativo e tentar desligá-lo 
+void endError() {
+  if(showErrorUntil > 0 && showErrorUntil < cycle) {
+    digitalWrite(ERRORLEDPIN, LOW);
+    showErrorUntil = 0;
+  }
+}
+
 void setup() {
   // Inicializando variáveis
   cycle = 0;
   carState = 0;
   speed = 0;
   headlightState = 0;
+  showErrorUntil = 0;
   ACon = false;
 
   // Configurando display
@@ -351,6 +396,7 @@ void setup() {
   pinMode(SMALLLEDPIN, OUTPUT);
   pinMode(BIGLEDPIN, OUTPUT);
   pinMode(TRIGPIN, OUTPUT);
+  pinMode(ERRORLEDPIN, OUTPUT);
   pinMode(ECHOPIN, INPUT);
   pinMode(HEADLIGHTBUTTONPIN, INPUT_PULLUP);
   pinMode(ACBUTTONPIN, INPUT_PULLUP);
@@ -372,6 +418,9 @@ void loop() {
     case 1: startEngine(); break;
     case 2: run();
   }
+
+  // Tenta desligar o led de erro
+  endError();
 
   // Contagem do ciclo
   delay(CYCLETIME);

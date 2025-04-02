@@ -5,7 +5,7 @@ COMPILADOR = gcc
 
 NOME = davinascimento
 MATRICULA = 202300027801
-PROJETO = labirinto
+PROJETO = criptografia
 EXTENSAO = .c
 
 # Deixe vazia se o make estiver no mesmo diretório
@@ -37,7 +37,7 @@ valf: compiledb fastrunvalgrind clean
 compile: $(CODIGO)
 	$(COMPILADOR) $(CODIGO) -o $(EXE) -Wall -lm
 
-run: $(EXE) $(ENTRADA).input
+run: $(EXE)
 ifeq ($(SYS), windows)
 	$(EXE).exe $(ENTRADA).input $(SAIDA).output
 else

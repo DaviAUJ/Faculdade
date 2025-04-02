@@ -1,3 +1,6 @@
+// Projeto: simulação de um painel de carro
+// Integrantes: Davi Araújo do Nascimento - T01, William Gabriel Yckson Araujo Braga - T01
+
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 #include <Math.h>

@@ -53,24 +53,27 @@ uint16_t pegarInt() {
         saida += (bufferEntrada.armazenamento[bufferEntrada.cursor++] - 48) * pow(10, numChar);
     }
 
-    bufferEntrada.cursor += (bufferEntrada.armazenamento[bufferEntrada.cursor + 1] > ' ' ? 1 : 2);
+    bufferEntrada.cursor += (bufferEntrada.armazenamento[bufferEntrada.cursor] < ' ' ? 2 : 1);
 
     return saida;
 }
 
 vector2_t pegarLabirinto(int8_t n_Colunas, int8_t n_Linhas, char local[n_Linhas][n_Colunas]) {
     vector2_t saida;
-    
+
     for(int8_t i_Linhas = 0; i_Linhas < n_Linhas; i_Linhas++) {
         for(int8_t i_Colunas = 0; i_Colunas < n_Colunas; i_Colunas++) {
             local[i_Linhas][i_Colunas] = bufferEntrada.armazenamento[bufferEntrada.cursor];
-            bufferEntrada.cursor += 2;
-
-            if(local[i_Linhas][i_Colunas] == 'X') {
+            
+            if(bufferEntrada.armazenamento[bufferEntrada.cursor] == 'X') {
                 saida.x = i_Colunas;
                 saida.y = i_Linhas;
             }
+
+            bufferEntrada.cursor += 2;
         }
+
+        bufferEntrada.cursor++;
     }
 
     return saida;
@@ -115,6 +118,7 @@ int main(int argc, char** argv) {
     for(uint16_t l = 0, n_Labirintos = pegarInt(); l < n_Labirintos; l++) {
         int8_t n_Colunas = pegarInt();
         int8_t n_Linhas = pegarInt();
+    
         char labirinto[n_Linhas][n_Colunas];
         vector2_t saida = {-1, -1};
         pilha_t pilha = {

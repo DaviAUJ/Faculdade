@@ -3,11 +3,12 @@
 #include <stdint.h>
 #include <math.h>
 
-#define TAMBUFFER 10000000
+#define TAMBUFFER 17000000
 #define TESTE printf("TESTE\n")
 #define PSTRING(ptr) printf("%s\n", ptr)
 #define PINT(var) printf("%d\n", var)
 #define PCHAR(var) printf("%c\n", var)
+//#define PHEXSEQ(ptr, x, y) for(uint16_t i = 0; i < x; i++) { printf("%2.2X%c", ptr[i], ((i+1)%y) ? ' ' : '\n'); }
 
 typedef struct buffer {
     char armazenamento[TAMBUFFER];
@@ -32,10 +33,10 @@ typedef struct pilha {
 buffer_t bufferEntrada;  
 buffer_t bufferSaida;
 const vector2_t checagem[4] = {
-    {0, -1},
-    {1, 0},
-    {0, 1},
-    {-1, 0},
+    {1, 0}, // D
+    {0, -1}, // F
+    {-1, 0}, // E
+    {0, 1} // T
 };
 
 uint16_t pegarInt() {
@@ -53,7 +54,7 @@ uint16_t pegarInt() {
         saida += (bufferEntrada.armazenamento[bufferEntrada.cursor++] - 48) * pow(10, numChar);
     }
 
-    bufferEntrada.cursor += (bufferEntrada.armazenamento[bufferEntrada.cursor] < ' ' ? 2 : 1);
+    bufferEntrada.cursor += 1;
 
     return saida;
 }
@@ -85,12 +86,25 @@ void escrever(char* string) {
     }
 }
 
-void escreverInt(uint8_t numero) {
+void escreverInt(uint16_t numero) {
     if(numero) {
-        while(numero) {
-            bufferSaida.armazenamento[bufferSaida.cursor++] = numero % 10 + 48;
-            numero /= 10;
-        }
+        uint8_t divisor = 100;
+        uint16_t d;
+
+        do {
+            d = numero / divisor;
+            
+            if(d) {
+                bufferSaida.armazenamento[bufferSaida.cursor++] = d % 10 + 48;
+            }
+            
+            switch(divisor) {
+                case 100: divisor = 10; break;
+                case 10: divisor = 1; break;
+                
+                default: numero = 0; break;
+            }
+        } while(numero);
     }
     else {
         bufferSaida.armazenamento[bufferSaida.cursor++] = '0';
@@ -108,9 +122,6 @@ void escreverLn() {
 }
 
 int main(int argc, char** argv) {
-    bufferEntrada.cursor = 0;
-    bufferSaida.cursor = 0;
-
     FILE* arquivo = fopen(argv[1], "r");
     fread(bufferEntrada.armazenamento, sizeof(char), TAMBUFFER, arquivo);
     fclose(arquivo);
@@ -122,7 +133,7 @@ int main(int argc, char** argv) {
         char labirinto[n_Linhas][n_Colunas];
         vector2_t saida = {-1, -1};
         pilha_t pilha = {
-            (backtrack_t*)malloc(sizeof(backtrack_t) * ((n_Linhas - 2) * (n_Colunas - 2)) + 1), 
+            (backtrack_t*)malloc(sizeof(backtrack_t) * (((uint32_t)n_Linhas - 2) * (n_Colunas - 2)) + 1), 
             0
         };
         
@@ -142,7 +153,7 @@ int main(int argc, char** argv) {
                     escrever("|FIM@-,-\n");
                     break;
                 }
-
+                
                 escrever("|BT@"); escreverVector2(topo->posicao); escrever("->");
                 escreverVector2(pilha.vetor[pilha.topo].posicao);
 
@@ -160,15 +171,15 @@ int main(int argc, char** argv) {
             }
 
             switch(topo->nivel) {
-                case 0: escrever("|F->"); break;
-                case 1: escrever("|D->"); break;
-                case 2: escrever("|T->"); break;
-                case 3: escrever("|E->");
+                case 0: escrever("|D->"); break;
+                case 1: escrever("|F->"); break;
+                case 2: escrever("|E->"); break;
+                case 3: escrever("|T->");
             }
 
             topo->nivel++;
             
-            labirinto[topo->posicao.y][topo->posicao.x] = 'X';
+            labirinto[proxPos.y][proxPos.x] = 'X';
             topo = &pilha.vetor[++pilha.topo];
             topo->nivel = 0;
             topo->posicao = proxPos;
@@ -192,6 +203,7 @@ int main(int argc, char** argv) {
     arquivo = fopen(argv[2], "w");
     fwrite(bufferSaida.armazenamento, sizeof(char), bufferSaida.cursor, arquivo);
     fclose(arquivo);
-
+    
+    
     return 0;
 }

@@ -1,10 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
+#include <stdbool.h>
 
 #define PINT(var) printf("%d\n", var)
+#define PLINT(var) printf("%ld\n", var)
+#define PHEX(var) printf("%2X\n", var)
+#define PLHEX(var) printf("%lX\n", var)
+#define PSTRING(ptr) printf("%s\n", ptr)
+#define PLN printf("\n")
+#define TESTE printf("Teste\n")
 
-#define BLOCK_SIZE 16
+
+
+
+
+// SEÇÃO PARA ENCRIPTAÇÃO AES
+
+#define PHEXSEQ(ptr, x, y) for(uint16_t i = 0; i < x; i++) { printf("%2.2X%c", ptr[i], ((i+1)%y) ? ' ' : '\n'); }
 
 typedef enum keySize {
     SIZE_16 = 16,
@@ -34,7 +48,7 @@ typedef struct expandedAESkey {
     expandedKeySize_m size;
 } expandedAESkey_t;
 
-const unsigned char sbox[256] = {
+const uint8_t sbox[256] = {
     //0     1    2      3     4    5     6     7      8    9     A      B    C     D     E     F
     0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76, //0
     0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0, //1
@@ -52,6 +66,29 @@ const unsigned char sbox[256] = {
     0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e, //D
     0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf, //E
     0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16  //F
+};
+
+const uint8_t rcon[255] = {
+    0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8,
+    0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3,
+    0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f,
+    0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d,
+    0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab,
+    0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d,
+    0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25,
+    0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01,
+    0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d,
+    0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa,
+    0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a,
+    0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02,
+    0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
+    0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef,
+    0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94,
+    0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04,
+    0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f,
+    0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5,
+    0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33,
+    0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb
 };
 
 expandedKeySize_m getExpandedSize(AESkey_t key) {
@@ -74,19 +111,532 @@ roundsNumber_m getRoundsNumber(AESkey_t key) {
     }
 }
 
-expandedAESkey_t expandKey(AESkey_t key) {
-    expandedAESkey_t expandedKey;
-    expandedKeySize_m expandedSize = getExpandedSize(key);
+void rotate(uint8_t* word) {
+    uint8_t a = word[0];
 
-    PINT(expandedSize);
+    for(uint8_t i = 0; i < 3; i++) {
+        word[i] = word[i + 1];
+    }
+
+    word[3] = a;
+}
+
+uint8_t* createRoundKey(expandedAESkey_t expandedKey, uint8_t section) {
+    uint8_t* output = (uint8_t*) malloc(sizeof(uint8_t) * 16);
+
+    for(uint8_t i = 0; i < 4; i++) {
+        for(uint8_t j = 0; j < 4; j++) {
+            output[i + (j * 4)] = expandedKey.sequence[section * 16 + i * 4 + j];
+        }
+    }
+
+    return output;
+}
+
+void addRoundKey(uint8_t* state, uint8_t* roundKey) {
+    for(uint8_t i = 0; i < 16; i++) {
+        state[i] ^= roundKey[i];
+    }
+}
+
+void substituteBytes(uint8_t* state) {
+    for(uint8_t i = 0; i < 16; i++) {
+        state[i] = sbox[state[i]];
+    }
+}
+
+void shiftRows(uint8_t* state) {
+    uint8_t shifted[16] = {
+        state[0], state[1], state[2], state[3],
+        state[5], state[6], state[7], state[4],
+        state[10], state[11], state[8], state[9],
+        state[15], state[12], state[13], state[14],
+    };
+
+    memcpy(state, shifted, 16);
+}
+
+uint8_t galoisMult(uint8_t a, uint8_t b) {
+    uint8_t output = 0;
+    uint8_t m = 0x1B;
+
+    while(b > 0) {
+        output ^= (b & 1) * a;
+        a = (a << 1) ^ ((a >> 7) * m);
+        b >>= 1;
+    }
+
+    return output;
+}
+
+void mixColumns(uint8_t* state) {
+    uint8_t column[4];
+
+    for(uint8_t i = 0; i < 4; i++) {
+        column[0] = state[0 + i];
+        column[1] = state[4 + i];
+        column[2] = state[8 + i];
+        column[3] = state[12 + i];
+        
+        state[0 + i] = 
+        galoisMult(column[0], 2) ^
+        galoisMult(column[3], 1) ^
+        galoisMult(column[2], 1) ^
+        galoisMult(column[1], 3);
+
+        state[4 + i] =
+        galoisMult(column[1], 2) ^
+        galoisMult(column[0], 1) ^
+        galoisMult(column[3], 1) ^
+        galoisMult(column[2], 3);
+
+        state[8 + i] =
+        galoisMult(column[2], 2) ^
+        galoisMult(column[1], 1) ^
+        galoisMult(column[0], 1) ^
+        galoisMult(column[3], 3);
+
+        state[12 + i] =
+        galoisMult(column[3], 2) ^
+        galoisMult(column[2], 1) ^
+        galoisMult(column[1], 1) ^
+        galoisMult(column[0], 3);
+    }
+}
+
+expandedAESkey_t expandKey(AESkey_t originalkey) {
+    expandedAESkey_t expandedKey;
+    uint8_t temp[4] = {0};
+    uint8_t currentSize = originalkey.size;
+    uint8_t rcon_I = 1;
+
+    expandedKey.size = getExpandedSize(originalkey);
+    expandedKey.sequence = (uint8_t*) malloc(sizeof(uint8_t) * expandedKey.size);
+
+    for(uint8_t i = 0; i < originalkey.size; i++) {
+        expandedKey.sequence[i] = originalkey.sequence[i];
+    }
+    
+    while(currentSize < expandedKey.size) {
+        for(uint8_t i = 0; i < 4; i++) {
+            temp[i] = expandedKey.sequence[(currentSize - 4) + i];
+        }
+
+        if(currentSize % originalkey.size == 0) {
+            rotate(temp);
+
+            for(uint8_t i = 0; i < 4; ++i) {
+                temp[i] = sbox[temp[i]]; 
+            }
+
+            temp[0] ^= rcon[rcon_I++];
+        }
+
+        if(originalkey.size == SIZE_32 && (currentSize % originalkey.size == 16)) {
+            for(uint8_t i = 0; i < 4; i++) {
+                temp[i] = sbox[temp[i]];
+            }
+        }
+
+        for(uint8_t i = 0; i < 4; i++) {
+            expandedKey.sequence[currentSize] = expandedKey.sequence[currentSize - originalkey.size] ^ temp[i];
+            currentSize++;
+        }
+    }
 
     return expandedKey;
 }
 
-int main() {
-    AESkey_t teste = { NULL, SIZE_24 };
+void encrypt(uint8_t* state, AESkey_t key) {
+    expandedAESkey_t expandedKey = expandKey(key);
+    uint8_t* roundKey = createRoundKey(expandedKey, 0);
+    roundsNumber_m rounds = getRoundsNumber(key);
 
-    expandKey(teste);
+    addRoundKey(state, roundKey);
+    free(roundKey);
+
+    for(uint8_t i = 1; i < rounds; i++) {
+        roundKey = createRoundKey(expandedKey, i);
+
+        substituteBytes(state);
+        shiftRows(state);
+        mixColumns(state);
+        addRoundKey(state, roundKey);
+
+        free(roundKey);
+    }
+
+    roundKey = createRoundKey(expandedKey, rounds);
+    substituteBytes(state);
+    shiftRows(state);
+    addRoundKey(state, roundKey);
+
+    free(roundKey);
+    free(expandedKey.sequence);
+}
+
+// FIM SEÇÃO
+
+
+
+
+
+// SEÇÃO PARA ARITMÉTICA
+
+#define P2K(var) printf("%X ", var.value[var.end]); for(int8_t i = var.end - 1; i >= 0; i--) { printf("%08X ", var.value[i]); } PLN
+
+#define MAX(a, b) a > b ? a : b
+#define MIN(a, b) a < b ? a : b
+#define CEIL_DIV(a, b) a / b + (a % b ? 1 : 0)
+
+#define BITS 32
+#define DIGITS 64
+#define HEX_PER_DIGIT 8
+#define UINT2K_INIT { {0}, 0 }
+
+typedef enum comparison {
+    LESS = 0,
+    EQUAL = 1,
+    GREATER = 2
+} comparison_m;
+
+typedef struct uint2k {
+    uint32_t value[DIGITS];
+    uint8_t end;
+} uint2k_t;
+
+uint2k_t add(uint2k_t* x, uint2k_t* y) {
+    uint2k_t output;
+    uint64_t result = 0;
+
+    output.end = MAX(x->end, y->end);
+
+    for(uint8_t i = 0; i <= output.end; i++) {
+        result = (uint64_t)x->value[i] + y->value[i] + (result >> BITS);
+        output.value[i] = result;
+    }
+    
+    if(result >> BITS) {
+        output.value[++output.end] = result >> BITS;
+    }
+
+    return output;
+}
+
+uint2k_t sub(uint2k_t* x, uint2k_t* y) {
+    uint2k_t output;
+    uint32_t carry = 0;
+
+    output.end = MAX(x->end, y->end);
+
+    for(uint8_t i = 0; i <= output.end; i++) {
+        if(x->value[i] >= (y->value[i] + carry)) {
+            output.value[i] = x->value[i] - (y->value[i] + carry);
+        }
+        else {
+            uint64_t borrowed = 0;
+            borrowed += x->value[i + 1];
+            borrowed <<= BITS;
+            borrowed += x->value[i];
+
+            borrowed -= y->value[i] + carry;
+            output.value[i] = borrowed;
+            borrowed >>= BITS;
+            carry = x->value[i + 1] - borrowed;
+        }
+    }
+
+    while(!output.value[output.end] && output.end != 0) {
+        output.end--;
+    }
+
+    return output;
+}
+
+uint2k_t shiftLeft(uint2k_t* x, uint8_t y) {
+    if(!y) return *x;
+
+    uint2k_t output = UINT2K_INIT;
+
+    output.end = MIN(DIGITS - 1, x->end + y);
+
+    for(uint8_t i = 0; i <= x->end; i++) {
+        uint8_t index = i + y;
+
+        if(index >= DIGITS) {
+            break;
+        }
+
+        output.value[index] = x->value[i];
+    }
+
+    return output;
+}
+
+uint2k_t binShiftRight(uint2k_t* x) {
+    uint2k_t output = UINT2K_INIT;
+    output.end = x->end;
+    
+    for(uint8_t i = 0; i <= x->end; i++) {
+        output.value[i] = (x->value[i] >> 1) + (x->value[i + 1] << (BITS - 1));
+    }
+
+    while(!output.value[output.end] && output.end > 0) {
+        output.end--;
+    }
+
+    return output;
+}
+
+comparison_m compare(uint2k_t* x, uint2k_t* y) {
+    if(x->end > y->end) {
+        return GREATER;
+    }
+
+    if(x->end < y->end) {
+        return LESS;
+    }
+
+    for(int8_t i = x->end; i >= 0; i--) {
+        if(x->value[i] == y->value[i]) {
+            continue;
+        }
+
+        if(x->value[i] > y->value[i]) {
+            return GREATER;
+        }
+
+        if(x->value[i] < y->value[i]) {
+            return LESS;
+        }
+    }
+
+    return EQUAL;
+}
+
+comparison_m compareImm32(uint2k_t* x, uint32_t y) {
+    if(x->end > 0 || x->value[0] > y) {
+        return GREATER;
+    }
+
+    if(x->value[0] < y) {
+        return LESS;
+    }
+
+    return EQUAL;
+}
+
+uint2k_t mod(uint2k_t* x, uint2k_t* y) {
+    uint2k_t output = *x;
+    
+    while(compare(&output, y) >= EQUAL) {
+        P2K(output);
+        output = sub(&output, y);
+    }
+
+    return output;
+}
+
+bool isOdd(uint2k_t* x) {
+    return x->value[0] & 0x00000001;
+}
+
+uint2k_t mult(uint2k_t* x, uint2k_t* y) {
+    uint2k_t output = UINT2K_INIT;
+    uint2k_t t = UINT2K_INIT;
+    uint64_t r = 0;
+
+    for(uint8_t ix = 0; ix <= x->end; ix++) {
+        t.end = -1;
+
+        for(uint8_t iy = 0; iy <= y->end; iy++) {
+            r = (uint64_t)x->value[ix] * y->value[iy] + (r >> BITS);
+            t.value[++t.end] = r;
+        }
+
+        if(r >> BITS) {
+            t.value[++t.end] = r >> BITS;
+        }
+
+        t = shiftLeft(&t, ix);
+        output = add(&output, &t);
+    }
+
+    return output;
+}
+
+uint2k_t modpow(uint2k_t* base, uint2k_t* exponent, uint2k_t* modulus) {
+    uint2k_t output = UINT2K_INIT;
+    uint2k_t newBase = UINT2K_INIT;
+    uint2k_t exponentCopy = *exponent;
+
+    output.value[0] = 1;
+    newBase = mod(base, modulus);
+
+    while(true) {
+        if(isOdd(&exponentCopy)) {
+            output = mult(&output, &newBase);
+            output = mod(&output, modulus);
+        }
+        
+        exponentCopy = binShiftRight(&exponentCopy);
+        
+        if(compareImm32(&exponentCopy, 0) == EQUAL) {
+            break;
+        }
+        
+        newBase = mult(&newBase, &newBase);
+        newBase = mod(&newBase, modulus);
+    }
+
+    return output;
+}
+
+//FIM SEÇÃO
+
+
+
+
+
+// SEÇÃO PARA DIFFIE-HELLMAN
+
+uint2k_t diffieHellman(uint2k_t* secretA, uint2k_t* secretB, uint2k_t* base, uint2k_t* mod) {
+    uint2k_t output = UINT2K_INIT;
+    
+    output = modpow(base, secretA, mod);
+    output = modpow(&output, secretB, mod);
+    
+    return output;
+}
+
+// AESkey_t formatKey(uint2k_t* n) {
+
+// }
+
+// FIM SEÇÃO
+
+
+
+
+
+// SEÇÃO PARA I/O
+
+#define PIN(n) for(int16_t i = -n; i <= n; i++) { printf("%02X ", bufferIn.data[bufferIn.cursor + i]); } PLN
+#define POUT(n) for(int16_t i = -n; i <= n; i++) { printf("%02X ", bufferOut.data[bufferOut.cursor + i]); } PLN
+
+#define OPEN_INPUT_FILE fileHandler = fopen(argv[1], "r")
+#define OPEN_OUTPUT_FILE fileHandler = fopen(argv[2], "w")
+#define CLOSE_FILE fclose(fileHandler)
+#define READ_FILE fread(bufferIn.data, sizeof(char), BUFFER_IN_SIZE, fileHandler)
+#define WRITE_FILE fread(bufferOut.data, sizeof(char), bufferOut.cursor, fileHandler)
+
+#define BUFFER_IN_SIZE 5000000
+#define BUFFER_OUT_SIZE 5000000
+#define CHARINT_OFFSET 48
+#define CHARHEX_OFFSET 55
+
+typedef struct bufferIn {
+    char data[BUFFER_IN_SIZE];
+    uint32_t cursor;
+} bufferIn_t;
+
+typedef struct bufferOut {
+    char data[BUFFER_OUT_SIZE];
+    uint32_t cursor;
+} bufferOut_t;
+
+FILE* fileHandler;
+bufferIn_t bufferIn;
+bufferOut_t bufferOut;
+
+uint8_t getOperationsQuantity() {
+    uint8_t n_digits = 0;
+    uint8_t output = 0;
+    uint8_t multiplier = 1;
+
+    while(bufferIn.data[bufferIn.cursor] >= '0') {
+        n_digits++;
+        bufferIn.cursor++;
+    }
+
+    for(uint8_t i = 1; i <= n_digits; i++) {
+        output += (bufferIn.data[bufferIn.cursor - i] - CHARINT_OFFSET) * multiplier;
+        multiplier *= 10;
+    }
+
+    bufferIn.cursor++;
+
+    return output;
+}
+
+int16_t getUint2k(uint2k_t *dest) {
+    uint2k_t output = UINT2K_INIT;
+    int16_t r;
+    int16_t n_hex = 0;
+
+    while(bufferIn.data[bufferIn.cursor] >= '0') {
+        n_hex++;
+        bufferIn.cursor++;
+    }
+
+    r = n_hex;
+    bufferIn.cursor -= n_hex;
+    output.end = CEIL_DIV(n_hex, HEX_PER_DIGIT) - 1;
+    n_hex--;
+
+    for(int8_t i_digit = output.end; i_digit >= 0;) {
+        uint32_t digit = bufferIn.data[bufferIn.cursor];
+        output.value[i_digit] += (digit - (digit >= 'A' ? CHARHEX_OFFSET : CHARINT_OFFSET)) << ((n_hex % HEX_PER_DIGIT) * 4);
+        // PINT(bufferIn.data[bufferIn.cursor]);
+
+        bufferIn.cursor++;
+        i_digit -= n_hex % HEX_PER_DIGIT ? 0 : 1;
+        n_hex--;
+    }
+
+    bufferIn.cursor++;
+
+    *dest = output;
+    return r;
+}
+
+// FIM SEÇÃO
+
+
+
+// SEÇÃO PARA MAIN
+
+uint8_t n_operations;
+int16_t sizeSecret;
+uint2k_t a;
+uint2k_t b;
+uint2k_t genator;
+uint2k_t prime;
+AESkey_t key;
+expandedAESkey_t expandedKey;
+
+uint2k_t teste;
+
+int main(int argc, char** argv) {
+    OPEN_INPUT_FILE;
+    READ_FILE;
+    CLOSE_FILE;
+
+    n_operations = getOperationsQuantity();
+
+    for(uint8_t i = 0; i < 1; i++) {
+        bufferIn.cursor += 3;
+
+        sizeSecret = getUint2k(&a);
+        getUint2k(&b);
+        //getUint2k(&genator);
+        //getUint2k(&prime);
+        
+        teste = modpow(&a, &b, &b);
+        P2K(teste);
+    }
 
     return 0;
 }
+
+// FIM SEÇÃO

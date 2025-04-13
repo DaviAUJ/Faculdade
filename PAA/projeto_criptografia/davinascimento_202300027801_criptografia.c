@@ -291,8 +291,11 @@ void encrypt(uint8_t* state, AESkey_t key) {
 
 #define BITS 32
 #define DIGITS 64
+#define LAST_POS 63
 #define HEX_PER_DIGIT 8
 #define UINT2K_INIT { {0}, 0 }
+
+const uint64_t BASE = (uint64_t)UINT32_MAX + 1;
 
 typedef enum comparison {
     LESS = 0,
@@ -306,7 +309,7 @@ typedef struct uint2k {
 } uint2k_t;
 
 uint2k_t add(uint2k_t* x, uint2k_t* y) {
-    uint2k_t output;
+    uint2k_t output = UINT2K_INIT;
     uint64_t result = 0;
 
     output.end = MAX(x->end, y->end);
@@ -316,7 +319,7 @@ uint2k_t add(uint2k_t* x, uint2k_t* y) {
         output.value[i] = result;
     }
     
-    if(result >> BITS) {
+    if(result >> BITS && output.end < DIGITS) {
         output.value[++output.end] = result >> BITS;
     }
 
@@ -357,7 +360,6 @@ uint2k_t shiftLeft(uint2k_t* x, uint8_t y) {
     if(!y) return *x;
 
     uint2k_t output = UINT2K_INIT;
-
     output.end = MIN(DIGITS - 1, x->end + y);
 
     for(uint8_t i = 0; i <= x->end; i++) {
@@ -368,6 +370,22 @@ uint2k_t shiftLeft(uint2k_t* x, uint8_t y) {
         }
 
         output.value[index] = x->value[i];
+    }
+
+    return output;
+}
+
+uint2k_t shiftRight(uint2k_t* x, uint8_t y) {
+    if(!y) return *x;
+
+    uint2k_t output = UINT2K_INIT;
+    
+    if(y >= x->end) {
+        return output;
+    }
+
+    for(uint8_t i = 0; i <= x->end; i++) {
+        output.value[i] = x->value[i + y];
     }
 
     return output;
@@ -426,13 +444,24 @@ comparison_m compareImm32(uint2k_t* x, uint32_t y) {
     return EQUAL;
 }
 
-uint2k_t mod(uint2k_t* x, uint2k_t* y) {
-    uint2k_t output = *x;
-    
-    while(compare(&output, y) >= EQUAL) {
-        P2K(output);
-        output = sub(&output, y);
+uint2k_t divImm32(uint2k_t* x, uint32_t y) {
+    uint2k_t output = UINT2K_INIT;
+
+    if(!y) return output;
+
+    output.end = x->end;
+    output.value[output.end] = x->value[x->end] / y;
+    uint64_t r = ((uint64_t)x->value[x->end] % y) << BITS;
+
+    for(int8_t i = x->end - 1; i >= 0; i--) {
+        r += x->value[i];
+        output.value[i] = r / y;
+        r = (r % y) << BITS;
     }
+
+    while(!output.value[output.end]) {
+        output.end--;
+    } 
 
     return output;
 }
@@ -452,9 +481,16 @@ uint2k_t mult(uint2k_t* x, uint2k_t* y) {
         for(uint8_t iy = 0; iy <= y->end; iy++) {
             r = (uint64_t)x->value[ix] * y->value[iy] + (r >> BITS);
             t.value[++t.end] = r;
+
+            if(t.end >= LAST_POS) {
+                t = shiftLeft(&t, ix);
+                output = add(&output, &t);
+
+                return output;
+            }
         }
 
-        if(r >> BITS) {
+        if(r >> BITS && t.end < LAST_POS) {
             t.value[++t.end] = r >> BITS;
         }
 
@@ -465,18 +501,207 @@ uint2k_t mult(uint2k_t* x, uint2k_t* y) {
     return output;
 }
 
+uint2k_t multImm32(uint2k_t* x, uint32_t y) {
+    uint2k_t output = UINT2K_INIT;
+    uint64_t t = 0;
+    output.end = x->end;
+
+    for(uint8_t i = 0; i <= x->end; i++) {
+        t = (uint64_t)x->value[i] * y + (t >> BITS);
+        output.value[i] = t;
+    }
+
+    if(t >> BITS && output.end < LAST_POS) {
+        output.value[++output.end] = t >> BITS; 
+    }
+
+    return output;
+}
+
+uint2k_t modImm32(uint2k_t* x, uint32_t y) {
+    uint2k_t output = UINT2K_INIT;
+    uint64_t t = 0;
+
+    for(uint8_t i = 0; i <= x->end; i++) {
+        t += x->value[i] % y;
+    }
+
+    output.value[0] = t % y;
+    return output;
+}
+
+uint2k_t divb(uint2k_t* u, uint2k_t* v) {
+    uint2k_t q = UINT2K_INIT;
+
+    if(!v->end) return divImm32(u, v->value[0]);
+    
+    comparison_m c = compare(u, v);
+
+    if(c == LESS) 
+        return q;
+
+    if(c == EQUAL) {
+        q.value[0] = 1;
+        return q;
+    }
+
+    uint32_t f = BASE / ((uint64_t)v->value[v->end] + 1);
+    uint2k_t x = multImm32(u, f);
+    uint2k_t y = multImm32(v, f);
+    uint2k_t r;
+    q.end = u->end - v->end;
+
+    for(int8_t i = q.end; i >= 0; i--) {
+        uint64_t xx = (uint64_t)x.value[v->end + i + 1] * BASE + (uint64_t)x.value[v->end + i];
+        uint64_t qc = xx / y.value[v->end];
+        uint64_t rc = xx % y.value[v->end];
+        
+        if(qc == BASE || (qc * y.value[y.end - 1]) > (rc * BASE + x.value[y.end + i - 1])) {
+            qc--;
+            rc += y.value[y.end];
+        }
+
+        if(rc < BASE) {
+            if(qc == BASE || (qc * y.value[y.end - 1]) > (rc * BASE + x.value[y.end + i - 1])) {
+                qc--;
+                rc += y.value[y.end];
+            }
+        }
+
+        r = multImm32(&y, qc);
+        r = shiftLeft(&r, i);
+        x = sub(&x, &r);
+        q.value[i] = qc;
+
+        if(x.value[y.end + i + 2] != 0) {
+            q.value[i]--;
+            y.value[y.end + 1] = 0;
+            y = shiftLeft(&y, i);
+            x = add(&x, &y);
+        }
+    }
+
+    while(!q.value[q.end]) {
+        q.end--;
+    }
+
+    return q;
+}
+
+uint2k_t modb(uint2k_t* u, uint2k_t* v) {
+    uint2k_t r = UINT2K_INIT;
+
+    if(!v->end) return modImm32(u, v->value[0]);
+    
+    comparison_m c = compare(u, v);
+
+    if(c == LESS) 
+        return *u;
+
+    if(c == EQUAL) {
+        return r;
+    }
+
+    uint32_t f = BASE / ((uint64_t)v->value[v->end] + 1);
+    uint2k_t x = multImm32(u, f);
+    uint2k_t y = multImm32(v, f);
+
+    for(int8_t i = u->end - v->end; i >= 0; i--) {
+        uint64_t xx = (uint64_t)x.value[v->end + i + 1] * BASE + (uint64_t)x.value[v->end + i];
+        uint64_t qc = xx / y.value[v->end];
+        uint64_t rc = xx % y.value[v->end];
+        
+        if(qc == BASE || (qc * y.value[y.end - 1]) > (rc * BASE + x.value[y.end + i - 1])) {
+            qc--;
+            rc += y.value[y.end];
+        }
+
+        if(rc < BASE) {
+            if(qc == BASE || (qc * y.value[y.end - 1]) > (rc * BASE + x.value[y.end + i - 1])) {
+                qc--;
+                rc += y.value[y.end];
+            }
+        }
+
+        r = multImm32(&y, qc);
+        r = shiftLeft(&r, i);
+        x = sub(&x, &r);
+
+        uint8_t m = y.end + i + 2;
+        if(m <= DIGITS && x.value[m] != 0) {
+            y.value[y.end + 1] = 0;
+            y = shiftLeft(&y, i);
+            x = add(&x, &y);
+        }
+    }
+
+    r = divImm32(&x, f);
+
+    return r;
+}
+
+// uint2k_t mod(uint2k_t* x, uint2k_t* y) {
+//     uint2k_t output = UINT2K_INIT;
+
+//     if(compare(x, y) == LESS || compareImm32(y, 0) == EQUAL) {
+//         return output;
+//     }
+    
+//     int8_t shift = x->end - y->end;
+//     uint2k_t divisor = shiftLeft(y, shift);
+//     uint2k_t estimativa;
+//     output = *x;
+    
+//     while(shift >= 0) {
+//         P2K(output);
+//         if(compare(&output, &divisor) == GREATER) {
+//             estimativa = multImm32(&output, output.value[output.end] / divisor.value[divisor.end] + 1);
+//             comparison_m c = compare(&output, &estimativa);
+    
+//             if(c == GREATER) {
+//                 estimativa = add(&estimativa, &divisor);
+    
+//                 while(compare(&output, &estimativa) == GREATER) {
+//                     estimativa = add(&estimativa, &divisor);
+//                 }
+    
+//                 estimativa = sub(&estimativa, &divisor);
+//                 output = sub(&output, &estimativa);
+//             }
+//             else if(c == LESS) {
+//                 estimativa = sub(&estimativa, &divisor);
+    
+//                 while(compare(&output, &estimativa) == LESS) {
+//                     estimativa = sub(&estimativa, &divisor);
+//                 }
+    
+//                 output = sub(&output, &estimativa);
+//             }
+//             else {
+//                 uint2k_t o = UINT2K_INIT;
+//                 return o;
+//             }
+//         } 
+
+//         divisor = shiftRight(&divisor, 1);
+//         shift--;
+//     }
+
+//     return output;
+// }
+
 uint2k_t modpow(uint2k_t* base, uint2k_t* exponent, uint2k_t* modulus) {
     uint2k_t output = UINT2K_INIT;
     uint2k_t newBase = UINT2K_INIT;
     uint2k_t exponentCopy = *exponent;
 
     output.value[0] = 1;
-    newBase = mod(base, modulus);
+    newBase = modb(base, modulus);
 
     while(true) {
         if(isOdd(&exponentCopy)) {
             output = mult(&output, &newBase);
-            output = mod(&output, modulus);
+            output = modb(&output, modulus);
         }
         
         exponentCopy = binShiftRight(&exponentCopy);
@@ -486,7 +711,7 @@ uint2k_t modpow(uint2k_t* base, uint2k_t* exponent, uint2k_t* modulus) {
         }
         
         newBase = mult(&newBase, &newBase);
-        newBase = mod(&newBase, modulus);
+        newBase = modb(&newBase, modulus);
     }
 
     return output;
@@ -629,10 +854,10 @@ int main(int argc, char** argv) {
 
         sizeSecret = getUint2k(&a);
         getUint2k(&b);
-        //getUint2k(&genator);
-        //getUint2k(&prime);
-        
-        teste = modpow(&a, &b, &b);
+        getUint2k(&genator);
+        getUint2k(&prime);
+
+        teste = diffieHellman(&a, &b, &genator, &prime);
         P2K(teste);
     }
 

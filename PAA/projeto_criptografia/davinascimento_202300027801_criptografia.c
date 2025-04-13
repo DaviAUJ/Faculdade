@@ -290,8 +290,8 @@ void encrypt(uint8_t* state, AESkey_t key) {
 #define CEIL_DIV(a, b) a / b + (a % b ? 1 : 0)
 
 #define BITS 32
-#define DIGITS 64
-#define LAST_POS 63
+#define DIGITS 96
+#define LAST_POS 95
 #define HEX_PER_DIGIT 8
 #define UINT2K_INIT { {0}, 0 }
 
@@ -305,7 +305,7 @@ typedef enum comparison {
 
 typedef struct uint2k {
     uint32_t value[DIGITS];
-    uint8_t end;
+    uint_t8 end;
 } uint2k_t;
 
 uint2k_t add(uint2k_t* x, uint2k_t* y) {
@@ -470,10 +470,31 @@ bool isOdd(uint2k_t* x) {
     return x->value[0] & 0x00000001;
 }
 
+uint2k_t multImm32(uint2k_t* x, uint32_t y) {
+    uint2k_t output = UINT2K_INIT;
+    uint64_t t = 0;
+    output.end = x->end;
+
+    if(!y) return output;
+
+    for(uint8_t i = 0; i <= x->end; i++) {
+        t = (uint64_t)x->value[i] * y + (t >> BITS);
+        output.value[i] = t;
+    }
+
+    if(t >> BITS && output.end < LAST_POS) {
+        output.value[++output.end] = t >> BITS; 
+    }
+
+    return output;
+}
+
 uint2k_t mult(uint2k_t* x, uint2k_t* y) {
     uint2k_t output = UINT2K_INIT;
     uint2k_t t = UINT2K_INIT;
     uint64_t r = 0;
+
+    if(!y->end) return multImm32(x, y->value[y->end]);
 
     for(uint8_t ix = 0; ix <= x->end; ix++) {
         t.end = -1;
@@ -490,7 +511,7 @@ uint2k_t mult(uint2k_t* x, uint2k_t* y) {
             }
         }
 
-        if(r >> BITS && t.end < LAST_POS) {
+        if((r >> BITS) && (t.end < LAST_POS)) {
             t.value[++t.end] = r >> BITS;
         }
 
@@ -501,32 +522,21 @@ uint2k_t mult(uint2k_t* x, uint2k_t* y) {
     return output;
 }
 
-uint2k_t multImm32(uint2k_t* x, uint32_t y) {
-    uint2k_t output = UINT2K_INIT;
-    uint64_t t = 0;
-    output.end = x->end;
-
-    for(uint8_t i = 0; i <= x->end; i++) {
-        t = (uint64_t)x->value[i] * y + (t >> BITS);
-        output.value[i] = t;
-    }
-
-    if(t >> BITS && output.end < LAST_POS) {
-        output.value[++output.end] = t >> BITS; 
-    }
-
-    return output;
-}
-
 uint2k_t modImm32(uint2k_t* x, uint32_t y) {
     uint2k_t output = UINT2K_INIT;
-    uint64_t t = 0;
 
-    for(uint8_t i = 0; i <= x->end; i++) {
-        t += x->value[i] % y;
+    if(!y) return output;
+
+    uint64_t r = x->value[0];
+
+    for(int8_t i = x->end; i >= 1; i--) {
+        r = ((uint64_t)x->value[i] % y) << BITS;
+        r += x->value[i - 1];
     }
 
-    output.value[0] = t % y;
+    output.value[0] = r % y;
+    output.end = 0;
+
     return output;
 }
 
@@ -592,7 +602,7 @@ uint2k_t modb(uint2k_t* u, uint2k_t* v) {
     uint2k_t r = UINT2K_INIT;
 
     if(!v->end) return modImm32(u, v->value[0]);
-    
+
     comparison_m c = compare(u, v);
 
     if(c == LESS) 
@@ -692,11 +702,10 @@ uint2k_t modb(uint2k_t* u, uint2k_t* v) {
 
 uint2k_t modpow(uint2k_t* base, uint2k_t* exponent, uint2k_t* modulus) {
     uint2k_t output = UINT2K_INIT;
-    uint2k_t newBase = UINT2K_INIT;
     uint2k_t exponentCopy = *exponent;
 
     output.value[0] = 1;
-    newBase = modb(base, modulus);
+    uint2k_t newBase = modb(base, modulus);
 
     while(true) {
         if(isOdd(&exponentCopy)) {
@@ -709,8 +718,11 @@ uint2k_t modpow(uint2k_t* base, uint2k_t* exponent, uint2k_t* modulus) {
         if(compareImm32(&exponentCopy, 0) == EQUAL) {
             break;
         }
-        
+
+        //TESTE;
+        //P2K(newBase);
         newBase = mult(&newBase, &newBase);
+        //P2K(newBase);
         newBase = modb(&newBase, modulus);
     }
 
@@ -852,10 +864,24 @@ int main(int argc, char** argv) {
     for(uint8_t i = 0; i < 1; i++) {
         bufferIn.cursor += 3;
 
-        sizeSecret = getUint2k(&a);
+        getUint2k(&a);
         getUint2k(&b);
         getUint2k(&genator);
         getUint2k(&prime);
+        // P2K(a);
+        // P2K(b);
+        // P2K(genator);
+        // P2K(prime);
+
+        // a.value[1] = 1;
+        // a.value[0] = 1480040264;
+        // a.end = 1;
+        // b.value[1] = 2;
+        // b.value[0] = 2154684645;
+        // b.end = 1;
+        // genator.value[1] = 3;
+        // genator.value[0] = 528571556;
+        // genator.end = 1;
 
         teste = diffieHellman(&a, &b, &genator, &prime);
         P2K(teste);

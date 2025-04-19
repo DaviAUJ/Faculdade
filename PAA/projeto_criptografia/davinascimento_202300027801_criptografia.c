@@ -283,7 +283,7 @@ void encrypt(uint8_t* state, AESkey_t key) {
 
 // SEÇÃO PARA ARITMÉTICA
 
-#define P2K(var) printf("%X ", var.value[var.end]); for(int8_t i = var.end - 1; i >= 0; i--) { printf("%08X ", var.value[i]); } PLN
+#define P2K(var) printf("%X ", var.value[var.end]); for(int16_t i = var.end - 1; i >= 0; i--) { printf("%08X ", var.value[i]); } PLN
 
 #define MAX(a, b) a > b ? a : b
 #define MIN(a, b) a < b ? a : b
@@ -305,106 +305,8 @@ typedef enum comparison {
 
 typedef struct uint2k {
     uint32_t value[DIGITS];
-    uint_t8 end;
+    uint16_t end;
 } uint2k_t;
-
-uint2k_t add(uint2k_t* x, uint2k_t* y) {
-    uint2k_t output = UINT2K_INIT;
-    uint64_t result = 0;
-
-    output.end = MAX(x->end, y->end);
-
-    for(uint8_t i = 0; i <= output.end; i++) {
-        result = (uint64_t)x->value[i] + y->value[i] + (result >> BITS);
-        output.value[i] = result;
-    }
-    
-    if(result >> BITS && output.end < DIGITS) {
-        output.value[++output.end] = result >> BITS;
-    }
-
-    return output;
-}
-
-uint2k_t sub(uint2k_t* x, uint2k_t* y) {
-    uint2k_t output;
-    uint32_t carry = 0;
-
-    output.end = MAX(x->end, y->end);
-
-    for(uint8_t i = 0; i <= output.end; i++) {
-        if(x->value[i] >= (y->value[i] + carry)) {
-            output.value[i] = x->value[i] - (y->value[i] + carry);
-        }
-        else {
-            uint64_t borrowed = 0;
-            borrowed += x->value[i + 1];
-            borrowed <<= BITS;
-            borrowed += x->value[i];
-
-            borrowed -= y->value[i] + carry;
-            output.value[i] = borrowed;
-            borrowed >>= BITS;
-            carry = x->value[i + 1] - borrowed;
-        }
-    }
-
-    while(!output.value[output.end] && output.end != 0) {
-        output.end--;
-    }
-
-    return output;
-}
-
-uint2k_t shiftLeft(uint2k_t* x, uint8_t y) {
-    if(!y) return *x;
-
-    uint2k_t output = UINT2K_INIT;
-    output.end = MIN(DIGITS - 1, x->end + y);
-
-    for(uint8_t i = 0; i <= x->end; i++) {
-        uint8_t index = i + y;
-
-        if(index >= DIGITS) {
-            break;
-        }
-
-        output.value[index] = x->value[i];
-    }
-
-    return output;
-}
-
-uint2k_t shiftRight(uint2k_t* x, uint8_t y) {
-    if(!y) return *x;
-
-    uint2k_t output = UINT2K_INIT;
-    
-    if(y >= x->end) {
-        return output;
-    }
-
-    for(uint8_t i = 0; i <= x->end; i++) {
-        output.value[i] = x->value[i + y];
-    }
-
-    return output;
-}
-
-uint2k_t binShiftRight(uint2k_t* x) {
-    uint2k_t output = UINT2K_INIT;
-    output.end = x->end;
-    
-    for(uint8_t i = 0; i <= x->end; i++) {
-        output.value[i] = (x->value[i] >> 1) + (x->value[i + 1] << (BITS - 1));
-    }
-
-    while(!output.value[output.end] && output.end > 0) {
-        output.end--;
-    }
-
-    return output;
-}
 
 comparison_m compare(uint2k_t* x, uint2k_t* y) {
     if(x->end > y->end) {
@@ -415,7 +317,7 @@ comparison_m compare(uint2k_t* x, uint2k_t* y) {
         return LESS;
     }
 
-    for(int8_t i = x->end; i >= 0; i--) {
+    for(int16_t i = x->end; i >= 0; i--) {
         if(x->value[i] == y->value[i]) {
             continue;
         }
@@ -444,6 +346,104 @@ comparison_m compareImm32(uint2k_t* x, uint32_t y) {
     return EQUAL;
 }
 
+uint2k_t add(uint2k_t* x, uint2k_t* y) {
+    uint2k_t output = UINT2K_INIT;
+    uint64_t result = 0;
+
+    output.end = MAX(x->end, y->end);
+
+    for(uint16_t i = 0; i <= output.end; i++) {
+        result = (uint64_t)x->value[i] + y->value[i] + (result >> BITS);
+        output.value[i] = result;
+    }
+    
+    if(result >> BITS && output.end < DIGITS) {
+        output.value[++output.end] = result >> BITS;
+    }
+
+    return output;
+}
+
+uint2k_t sub(uint2k_t* x, uint2k_t* y) {
+    uint2k_t output = UINT2K_INIT;
+    uint32_t carry = 0;
+
+    output.end = MAX(x->end, y->end);
+
+    for(uint16_t i = 0; i <= output.end; i++) {
+        if(x->value[i] >= (y->value[i] + carry)) {
+            output.value[i] = x->value[i] - (y->value[i] + carry);
+        }
+        else {
+            uint64_t borrowed = 0;
+            borrowed += x->value[i + 1];
+            borrowed <<= BITS;
+            borrowed += x->value[i];
+
+            borrowed -= y->value[i] + carry;
+            output.value[i] = borrowed;
+            borrowed >>= BITS;
+            carry = x->value[i + 1] - borrowed;
+        }
+    }
+
+    while(!output.value[output.end] && output.end != 0) {
+        output.end--;
+    }
+
+    return output;
+}
+
+uint2k_t shiftLeft(uint2k_t* x, uint16_t y) {
+    if(!y) return *x;
+
+    uint2k_t output = UINT2K_INIT;
+    output.end = MIN(LAST_POS, x->end + y);
+
+    for(uint16_t i = 0; i <= x->end; i++) {
+        uint16_t index = i + y;
+
+        if(index >= DIGITS) {
+            break;
+        }
+
+        output.value[index] = x->value[i];
+    }
+
+    return output;
+}
+
+uint2k_t shiftRight(uint2k_t* x, uint16_t y) {
+    if(!y) return *x;
+
+    uint2k_t output = UINT2K_INIT;
+    
+    if(y >= x->end) {
+        return output;
+    }
+
+    for(uint16_t i = 0; i <= x->end; i++) {
+        output.value[i] = x->value[i + y];
+    }
+
+    return output;
+}
+
+uint2k_t binShiftRight(uint2k_t* x) {
+    uint2k_t output = UINT2K_INIT;
+    output.end = x->end;
+    
+    for(uint16_t i = 0; i <= x->end; i++) {
+        output.value[i] = (x->value[i] >> 1) + (x->value[i + 1] << (BITS - 1));
+    }
+
+    while(!output.value[output.end] && output.end > 0) {
+        output.end--;
+    }
+
+    return output;
+}
+
 uint2k_t divImm32(uint2k_t* x, uint32_t y) {
     uint2k_t output = UINT2K_INIT;
 
@@ -453,7 +453,7 @@ uint2k_t divImm32(uint2k_t* x, uint32_t y) {
     output.value[output.end] = x->value[x->end] / y;
     uint64_t r = ((uint64_t)x->value[x->end] % y) << BITS;
 
-    for(int8_t i = x->end - 1; i >= 0; i--) {
+    for(int16_t i = x->end - 1; i >= 0; i--) {
         r += x->value[i];
         output.value[i] = r / y;
         r = (r % y) << BITS;
@@ -477,7 +477,7 @@ uint2k_t multImm32(uint2k_t* x, uint32_t y) {
 
     if(!y) return output;
 
-    for(uint8_t i = 0; i <= x->end; i++) {
+    for(uint16_t i = 0; i <= x->end; i++) {
         t = (uint64_t)x->value[i] * y + (t >> BITS);
         output.value[i] = t;
     }
@@ -485,6 +485,10 @@ uint2k_t multImm32(uint2k_t* x, uint32_t y) {
     if(t >> BITS && output.end < LAST_POS) {
         output.value[++output.end] = t >> BITS; 
     }
+
+    while(!output.value[output.end]) {
+        output.end--;
+    } 
 
     return output;
 }
@@ -496,10 +500,10 @@ uint2k_t mult(uint2k_t* x, uint2k_t* y) {
 
     if(!y->end) return multImm32(x, y->value[y->end]);
 
-    for(uint8_t ix = 0; ix <= x->end; ix++) {
+    for(uint16_t ix = 0; ix <= x->end; ix++) {
         t.end = -1;
 
-        for(uint8_t iy = 0; iy <= y->end; iy++) {
+        for(uint16_t iy = 0; iy <= y->end; iy++) {
             r = (uint64_t)x->value[ix] * y->value[iy] + (r >> BITS);
             t.value[++t.end] = r;
 
@@ -519,6 +523,10 @@ uint2k_t mult(uint2k_t* x, uint2k_t* y) {
         output = add(&output, &t);
     }
 
+    while(!output.value[output.end]) {
+        output.end--;
+    } 
+
     return output;
 }
 
@@ -529,7 +537,7 @@ uint2k_t modImm32(uint2k_t* x, uint32_t y) {
 
     uint64_t r = x->value[0];
 
-    for(int8_t i = x->end; i >= 1; i--) {
+    for(int16_t i = x->end; i >= 1; i--) {
         r = ((uint64_t)x->value[i] % y) << BITS;
         r += x->value[i - 1];
     }
@@ -561,7 +569,7 @@ uint2k_t divb(uint2k_t* u, uint2k_t* v) {
     uint2k_t r;
     q.end = u->end - v->end;
 
-    for(int8_t i = q.end; i >= 0; i--) {
+    for(int16_t i = q.end; i >= 0; i--) {
         uint64_t xx = (uint64_t)x.value[v->end + i + 1] * BASE + (uint64_t)x.value[v->end + i];
         uint64_t qc = xx / y.value[v->end];
         uint64_t rc = xx % y.value[v->end];
@@ -583,7 +591,8 @@ uint2k_t divb(uint2k_t* u, uint2k_t* v) {
         x = sub(&x, &r);
         q.value[i] = qc;
 
-        if(x.value[y.end + i + 2] != 0) {
+        uint16_t m = y.end + i + 2;
+        if(m <= LAST_POS && x.value[m] != 0) {
             q.value[i]--;
             y.value[y.end + 1] = 0;
             y = shiftLeft(&y, i);
@@ -616,7 +625,7 @@ uint2k_t modb(uint2k_t* u, uint2k_t* v) {
     uint2k_t x = multImm32(u, f);
     uint2k_t y = multImm32(v, f);
 
-    for(int8_t i = u->end - v->end; i >= 0; i--) {
+    for(int16_t i = u->end - v->end; i >= 0; i--) {
         uint64_t xx = (uint64_t)x.value[v->end + i + 1] * BASE + (uint64_t)x.value[v->end + i];
         uint64_t qc = xx / y.value[v->end];
         uint64_t rc = xx % y.value[v->end];
@@ -637,8 +646,9 @@ uint2k_t modb(uint2k_t* u, uint2k_t* v) {
         r = shiftLeft(&r, i);
         x = sub(&x, &r);
 
-        uint8_t m = y.end + i + 2;
-        if(m <= DIGITS && x.value[m] != 0) {
+        uint16_t m = y.end + i + 2;
+        if(x.value[m] != 0) {
+            TESTE;
             y.value[y.end + 1] = 0;
             y = shiftLeft(&y, i);
             x = add(&x, &y);
@@ -821,7 +831,7 @@ int16_t getUint2k(uint2k_t *dest) {
     output.end = CEIL_DIV(n_hex, HEX_PER_DIGIT) - 1;
     n_hex--;
 
-    for(int8_t i_digit = output.end; i_digit >= 0;) {
+    for(int16_t i_digit = output.end; i_digit >= 0;) {
         uint32_t digit = bufferIn.data[bufferIn.cursor];
         output.value[i_digit] += (digit - (digit >= 'A' ? CHARHEX_OFFSET : CHARINT_OFFSET)) << ((n_hex % HEX_PER_DIGIT) * 4);
         // PINT(bufferIn.data[bufferIn.cursor]);

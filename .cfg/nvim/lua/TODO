@@ -1,0 +1,9 @@
+limitar numero de sugestões do auto complete
+transformar tab em espaços
+tirar opção text do lsp 
+mudar onde fica o parenteses do for e while colocados automaticamente
+mudar para clipboard do vim ser compartilhada com a do pc
+pesquisar opções recomendadas do vim
+tirar os nomes do parametros colocados automaticamente no for, while e funções
+descobrir como que cerca algo com parenteses
+remover snippets das sugestões

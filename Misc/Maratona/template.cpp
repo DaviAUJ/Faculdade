@@ -1,9 +1,11 @@
+// LINK
+
 #include <bits/stdc++.h>
-#include <cstdint>
 
 using namespace std;
 
 #define FAST_IO ios_base::sync_with_stdio(0); cin.tie(0)
+#define SLOG(x) cout << x << endl;
 
 int main() {
     FAST_IO;

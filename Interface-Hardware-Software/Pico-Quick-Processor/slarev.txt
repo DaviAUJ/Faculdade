@@ -1,0 +1,211 @@
+indices:
+0: eax
+1: ecx
+2: edx
+3: ebx
+4: esp
+5: ebp
+6: esi
+7: edi
+
+0: r8d
+1: r9d
+2: r10d
+3: r11d
+4: r12d
+5: r13d
+6: r14d
+7: r15d
+
+
+mov rx, imm32:
+mov velho, imm32 -> (0xB8 + indice_dst) , imm32
+mov novo, imm32 -> 0x41 , (0xB8 + indice_dst) , imm32 
+
+mov rx, ry:
+mov velho, velho -> 0x89 , 0xC0 + indice_dst + (indice_src << 3)
+mov novo, velho -> 0x41 , 03x89 , 0xC0 + indice_dst + (indice_src << 3)
+mov velho, novo -> 0x44 , 0x89 , 0xC0 + indice_dst + (indice_src << 3)
+mov novo, novo -> 0x45 , 0x89 , 0xC0 + indice_dst + (indice_src << 3)
+
+mov rx, [ry + imm32]:
+mov velho, [velho + imm32] -> 0x67 , 0x8B , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov novo, [velho + imm32] -> 0x67 , 0x41 , 0x8B , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov velho, [novo + imm32] -> 0x67 , 0x44 , 0x8B , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov velho, [velho + imm32] -> 0x67 , 0x45 , 0x8B , 0x80 + indice_dst + (indice_src << 3) , imm32
+
+mov [rx + imm32], ry:
+mov [velho + imm32], velho -> 0x67 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov [novo + imm32], velho -> 0x67 , 0x41 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov [velho + imm32], novo -> 0x67 , 0x44 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov [novo + imm32], novo -> 0x67 , 0x45 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
+
+cmp rx, ry:
+cmp velho, velho -> 0x39 , 0xc0 + indice_dst + (indice_src << 3)
+cmp novo, velho -> 0x41 , 0x39 , 0xc0 + indice_dst + (indice_src << 3)
+cmp velho, novo -> 0x44 , 0x39 , 0xc0 + indice_dst + (indice_src << 3)
+cmp novo, novo -> 0x45 , 0x39 , 0xc0 + indice_dst + (indice_src << 3)
+
+jmp:
+jmp imm32 -> 0xE9 , imm32 - 0x05
+
+jg:
+jg imm32 -> 0x0F , 0x8F , imm32 - 0x06
+
+jl:
+jl imm32 -> 0x0F , 0x8C , imm32 - 0x06
+
+je:
+je imm32  -> 0x0f84 , imm32 - 0x06
+je 0xFFFF -> 0f 84 f9 ff 00 00
+
+
+
+add:
+add velho, velho -> 0x01C0   + indice_dst + (indice_src * 0x08)
+add novo, velho  -> 0x4101C0 + indice_dst + (indice_src * 0x08)
+add velho, novo  -> 0x4401C0 + indice_dst + (indice_src * 0x08)
+add novo, novo   -> 0x4501C0 + indice_dst + (indice_src * 0x08)
+
+0:  01 c0                   add    eax,eax
+2:  01 c8                   add    eax,ecx
+4:  01 d0                   add    eax,edx
+18: 41 01 c0                add    r8d,eax
+1b: 41 01 c8                add    r8d,ecx
+1e: 41 01 d0                add    r8d,edx 
+f:  44 01 c0                add    eax,r8d
+12: 44 01 c8                add    eax,r9d
+15: 44 01 d0                add    eax,r10d
+6:  45 01 c0                add    r8d,r8d
+9:  45 01 c8                add    r8d,r9d
+c:  45 01 d0                add    r8d,r10d
+
+
+
+sub:
+sub velho, velho -> 0x29C0   + indice_dst + (indice_src * 0x08)
+sub novo, velho  -> 0x4129C0 + indice_dst + (indice_src * 0x08)
+sub velho, novo  -> 0x4429C0 + indice_dst + (indice_src * 0x08)
+sub novo, novo   -> 0x4529C0 + indice_dst + (indice_src * 0x08)
+
+0:  29 c0                   sub    eax,eax
+2:  29 c8                   sub    eax,ecx
+4:  29 d0                   sub    eax,edx
+6:  41 29 c0                sub    r8d,eax
+9:  41 29 c8                sub    r8d,ecx
+c:  41 29 d0                sub    r8d,edx
+f:  44 29 c0                sub    eax,r8d
+12: 44 29 c8                sub    eax,r9d
+15: 44 29 d0                sub    eax,r10d
+18: 45 29 c0                sub    r8d,r8d
+1b: 45 29 c8                sub    r8d,r9d
+1e: 45 29 d0                sub    r8d,r10d 
+
+
+
+and:
+and velho, velho -> 0x21C0   + indice_dst + (indice_src * 0x08)
+and novo, velho  -> 0x4121C0 + indice_dst + (indice_src * 0x08)
+and velho, novo  -> 0x4421C0 + indice_dst + (indice_src * 0x08)
+and novo, novo   -> 0x4521C0 + indice_dst + (indice_src * 0x08)
+
+0:  21 c0                   and    eax,eax
+2:  21 c8                   and    eax,ecx
+4:  21 d0                   and    eax,edx
+6:  41 21 c0                and    r8d,eax
+9:  41 21 c8                and    r8d,ecx
+c:  41 21 d0                and    r8d,edx
+f:  44 21 c0                and    eax,r8d
+12: 44 21 c8                and    eax,r9d
+15: 44 21 d0                an09   eax,r10d
+18: 45 21 c0                and    r8d,r8d
+1b: 45 21 c8                and    r8d,r9d
+1e: 45 21 d0                and    r8d,r10d 
+
+
+
+or:
+or velho, velho -> 0x09C0   + indice_dst + (indice_src * 0x08)
+or novo, velho  -> 0x4109C0 + indice_dst + (indice_src * 0x08)
+or velho, novo  -> 0x4409C0 + indice_dst + (indice_src * 0x08)
+or novo, novo   -> 0x4509C0 + indice_dst + (indice_src * 0x08)
+
+0:  09 c0                   or     eax,eax
+2:  09 c8                   or     eax,ecx
+4:  09 d0                   or     eax,edx
+6:  41 09 c0                or     r8d,eax
+9:  41 09 c8                or     r8d,ecx
+c:  41 09 d0                or     r8d,edx
+f:  44 09 c0                or     eax,r8d
+12: 44 09 c8                or     eax,r9d
+15: 44 09 d0                or     eax,r10d
+18: 45 09 c0                or     r8d,r8d
+1b: 45 09 c8                or     r8d,r9d
+1e: 45 09 d0                or     r8d,r10d
+
+
+
+xor:
+xor velho, velho -> 0x31C0   + indice_dst + (indice_src * 0x08)
+xor novo, velho  -> 0x4131C0 + indice_dst + (indice_src * 0x08)
+xor velho, novo  -> 0x4431C0 + indice_dst + (indice_src * 0x08)
+xor novo, novo   -> 0x4531C0 + indice_dst + (indice_src * 0x08)
+
+0:  31 c0                   xor    eax,eax
+2:  31 c8                   xor    eax,ecx
+4:  31 d0                   xor    eax,edx
+6:  41 31 c0                xor    r8d,eax
+9:  41 31 c8                xor    r8d,ecx
+c:  41 31 d0                xor    r8d,edx
+f:  44 31 c0                xor    eax,r8d
+12: 44 31 c8                xor    eax,r9d
+15: 44 31 d0                xor    eax,r10d
+18: 45 31 c0                xor    r8d,r8d
+1b: 45 31 c8                xor    r8d,r9d
+1e: 45 31 d0                xor    r8d,r10d
+
+
+
+sal/shl:
+sal/shl velho, imm8 -> 0xC1E000   + indice << 4 + imm8
+sal/shl novo,  imm8 -> 0x41C1E000 + indice << 4 + imm8
+
+0:  c1 e0 04                shl    eax,0x4
+3:  c1 e1 05                shl    ecx,0x5
+6:  c1 e2 06                shl    edx,0x6
+9:  c1 e3 0f                shl    ebx,0xf
+c:  c1 e4 14                shl    esp,0x14
+f:  c1 e5 1e                shl    ebp,0x1e
+12: c1 e6 10                shl    esi,0x10
+15: c1 e7 12                shl    edi,0x12
+18: 41 c1 e0 04             shl    r8d,0x4
+1c: 41 c1 e1 05             shl    r9d,0x5
+20: 41 c1 e2 06             shl    r10d,0x6
+24: 41 c1 e3 0f             shl    r11d,0xf
+28: 41 c1 e4 10             shl    r12d,0x10
+2c: 41 c1 e5 12             shl    r13d,0x12
+30: 41 c1 e6 14             shl    r14d,0x14
+34: 41 c1 e7 1e             shl    r15d,0x1e
+
+
+
+sar:
+sar velho, imm8 -> 0xC1F800   + indice << 4 + imm8
+sar novo,  imm8 -> 0x41C1F800 + indice << 4 + imm8
+
+0:  c1 f8 04                sar    eax,0x4
+3:  c1 f9 05                sar    ecx,0x5
+6:  c1 fa 06                sar    edx,0x6
+9:  c1 fb 0f                sar    ebx,0xf
+c:  c1 fc 14                sar    esp,0x14
+f:  c1 fd 1e                sar    ebp,0x1e
+12: c1 fe 10                sar    esi,0x10
+15: c1 ff 12                sar    edi,0x12
+18: 41 c1 f8 04             sar    r8d,0x4
+1c: 41 c1 f9 05             sar    r9d,0x5
+20: 41 c1 fa 06             sar    r10d,0x6
+24: 41 c1 fb 0f             sar    r11d,0xf
+28: 41 c1 fc 10             sar    r12d,0x10
+2c: 41 c1 fd 12             sar    r13d,0x12
+30: 41 c1 fe 14             sar    r14d,0x14
+34: 41 c1 ff 1e             sar    r15d,0x1e

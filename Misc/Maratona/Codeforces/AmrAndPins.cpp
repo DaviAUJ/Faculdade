@@ -1,4 +1,4 @@
-// LINK
+// https://codeforces.com/problemset/problem/507/B
 
 #include <bits/stdc++.h>
 
@@ -13,6 +13,17 @@ typedef pair<int, int> iVec2;
 
 int main() {
     FAST_IO;
+
+    double r, x, y, xl, yl;
+
+    cin >> r >> x >> y >> xl >> yl;
+
+    double d;
+
+    d = (xl - x) * (xl - x) + (yl - y) * (yl - y);
+    d = sqrt(d);
+
+    cout << ceil(d / (2.0 * r)) << '\n';
 
     return 0;
 }

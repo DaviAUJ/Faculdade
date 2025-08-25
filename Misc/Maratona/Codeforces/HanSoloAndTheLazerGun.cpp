@@ -1,4 +1,4 @@
-// LINK
+// https://codeforces.com/problemset/problem/514/B
 
 #include <bits/stdc++.h>
 
@@ -13,6 +13,11 @@ typedef pair<int, int> iVec2;
 
 int main() {
     FAST_IO;
+
+    list<iVec2> troopers;   
+    iVec2 gun;
+    
+    cin >> 
 
     return 0;
 }

@@ -5,7 +5,7 @@
 using namespace std;
 
 #define FAST_IO ios_base::sync_with_stdio(0); cin.tie(0)
-#define SLOG(x) cout << x << endl;
+#define dbg(x) cout << #x << " = " << x << endl
 #define ff first
 #define ss second
 
@@ -25,24 +25,18 @@ int main() {
     int ans = 0;
 
     while(reach != start) {
-        if(start * 2 <= reach) {
-            start *= 2;
+        if(reach % 2) {
             ans++;
-            continue;
+            reach++;
         }
 
-        int dodiff;
+        ans++;
+        reach >>= 1;
 
-        if(reach % 2 == 1) {
-            dodiff = start - (reach >> 1) - 1;
-            ans += dodiff + 2;
-            break;
+        if(reach < start) {
+            ans += start - reach;
+            reach = start;
         }
-
-        dodiff = start - (reach >> 1);
-        ans += dodiff + 1;
-
-        break;
     }
 
     cout << ans << '\n';

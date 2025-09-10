@@ -1,0 +1,1 @@
+SELECT * FROM touhou.characters WHERE last_name = 'Scarlet' ORDER BY first_name ASC;

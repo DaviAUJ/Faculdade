@@ -1,5 +1,18 @@
-4 0 0
-1 1
-2 2
-2 0
--1 -1
+-1
+lp[n] = 2
+current.ff = 2
+lp[n] = 3
+current.ff = 3
+lp[n] = 2
+current.ff = 100
+lp[n] = 5
+current.ff = 5
+lp[n] = 7
+current.ff = 7
+current.ff = 1
+1
+2
+3
+-1
+2
+5

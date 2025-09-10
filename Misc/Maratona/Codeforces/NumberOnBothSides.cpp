@@ -1,5 +1,4 @@
-// LINK
-// Current Status:
+// https://codeforces.com/gym/103960/problem/N
 
 #include <bits/stdc++.h>
 
@@ -11,6 +10,12 @@ using namespace std;
 #define ss second
 
 typedef pair<int, int> ii;
+
+struct Card {
+    int value;
+    int full_value;
+
+}
 
 int main() {
     FAST_IO;

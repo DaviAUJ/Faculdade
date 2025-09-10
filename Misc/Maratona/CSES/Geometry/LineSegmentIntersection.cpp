@@ -7,7 +7,7 @@ using namespace std;
 #define FAST_IO ios_base::sync_with_stdio(0); cin.tie(0)
 #define SLOG(x) cout << x << endl;
 
-struct vec2 {
+struct vec2nc {
     int64_t x;
     int64_t y ;
 };
@@ -16,7 +16,7 @@ int main() {
     FAST_IO;
    
     int32_t cases;
-    vec2 p1, p2, p3, p4;
+    vec2nc p1, p2, p3, p4;
     cin >> cases;
 
     while(cases--) {

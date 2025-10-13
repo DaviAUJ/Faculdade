@@ -1,5 +1,5 @@
-// Link:
-// Current Status:
+// Link: https://cses.fi/problemset/task/1617
+// Current Status: Accepted
 
 #include <bits/stdc++.h>
 
@@ -14,6 +14,15 @@ typedef pair<int, int> ii;
 
 int main() {
     FAST_IO;
+
+    int n, ans = 1;
+    cin >> n; 
+    
+    for(int i = 0; i < n; i++) {
+        ans = (ans << 1) % 1000000007;
+    }
+
+    cout << ans << '\n';
 
     return 0;
 }

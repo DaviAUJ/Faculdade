@@ -3,7 +3,7 @@
 
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
-#include <Math.h>
+#include <math.h>
 
 // Constantes do display
 #define DISPLAYADDR 0x27

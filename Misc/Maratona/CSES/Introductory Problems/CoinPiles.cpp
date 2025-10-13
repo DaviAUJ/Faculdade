@@ -1,0 +1,44 @@
+// Link: https://cses.fi/problemset/task/1754
+// Current Status: later
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define FAST_IO ios_base::sync_with_stdio(0); cin.tie(0)
+#define dbg(x) cout << #x << " = " << x << endl
+#define ff first
+#define ss second
+
+typedef pair<int, int> ii;
+
+int main() {
+    FAST_IO;
+
+    int n;
+    cin >> n;
+
+    while(n--) {
+        uint32_t a, b;
+        cin >> a >> b;
+
+        if((a + b) % 3 != 0) {
+            cout << "NO\n";
+            continue;
+        }
+
+        if(b <= a * 2) {
+            cout << "NO\n";
+            continue;
+        }
+
+        if(a <= b * 2) {
+            cout << "NO\n";
+            continue;
+        }
+
+        cout << "YES\n";
+    }
+
+    return 0;
+}

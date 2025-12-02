@@ -4,3 +4,6 @@
 *.vvp
 *.elf
 *.out
+
+**/target/
+**/Cargo.lock

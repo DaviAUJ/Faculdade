@@ -1,4 +1,4 @@
-// Secret Entrance
+// Day 1: Secret Entrance
 
 use std::{fs::File, io::{BufRead, BufReader}, vec};
 

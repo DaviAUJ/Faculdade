@@ -1,8 +1,9 @@
-// Day 1: Secret Entrance
+// 1° dia: Secret Entrance
+// Status: Apenas parte 1 aceita
 
 use std::{fs::File, io::{BufRead, BufReader}, vec};
 
-// Part 1
+// Parte 1
 const INPUT_PATH: &str  = "./src/bin/day_1/input";
 const N_DIALS: u32      = 100;
 const DEFAULT_DIAL: u32 = 50;
@@ -48,7 +49,7 @@ fn get_first_password(sequence: &Vec<i16>) -> u32 {
     return output;
 }
 
-// Part 2
+// Parte 2
 fn get_second_password(sequence: &Vec<i16>) -> u32 {
     let mut output: u32 = 0;
     let mut dial: i16   = DEFAULT_DIAL as i16;

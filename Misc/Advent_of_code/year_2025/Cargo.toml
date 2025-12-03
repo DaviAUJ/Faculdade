@@ -7,3 +7,4 @@ edition = "2024"
 opt-level = 2
 
 [dependencies]
+fancy-regex = "0.16.2"

@@ -1,4 +1,4 @@
-indices:
+Índices:
 0: eax
 1: ecx
 2: edx
@@ -19,32 +19,32 @@ indices:
 
 
 mov rx, imm32:
-mov velho, imm32 -> (0xB8 + indice_dst) , imm32
-mov novo, imm32 -> 0x41 , (0xB8 + indice_dst) , imm32 
+mov velho, imm32 -> (0xB8 + indice_dst)        , imm32
+mov novo, imm32  -> 0x41 , (0xB8 + indice_dst) , imm32 
 
 mov rx, ry:
 mov velho, velho -> 0x89 , 0xC0 + indice_dst + (indice_src << 3)
-mov novo, velho -> 0x41 , 03x89 , 0xC0 + indice_dst + (indice_src << 3)
-mov velho, novo -> 0x44 , 0x89 , 0xC0 + indice_dst + (indice_src << 3)
-mov novo, novo -> 0x45 , 0x89 , 0xC0 + indice_dst + (indice_src << 3)
+mov novo, velho  -> 0x41 , 0x89 , 0xC0 + indice_dst + (indice_src << 3)
+mov velho, novo  -> 0x44 , 0x89 , 0xC0 + indice_dst + (indice_src << 3)
+mov novo, novo   -> 0x45 , 0x89 , 0xC0 + indice_dst + (indice_src << 3)
 
 mov rx, [ry + imm32]:
-mov velho, [velho + imm32] -> 0x67 , 0x8B , 0x80 + indice_dst + (indice_src << 3) , imm32
-mov novo, [velho + imm32] -> 0x67 , 0x41 , 0x8B , 0x80 + indice_dst + (indice_src << 3) , imm32
-mov velho, [novo + imm32] -> 0x67 , 0x44 , 0x8B , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov velho, [velho + imm32] -> 0x67 , 0x8B , 0x80 + indice_dst + (indice_src << 3)        , imm32
+mov novo,  [velho + imm32] -> 0x67 , 0x41 , 0x8B , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov velho, [novo + imm32]  -> 0x67 , 0x44 , 0x8B , 0x80 + indice_dst + (indice_src << 3) , imm32
 mov velho, [velho + imm32] -> 0x67 , 0x45 , 0x8B , 0x80 + indice_dst + (indice_src << 3) , imm32
 
 mov [rx + imm32], ry:
-mov [velho + imm32], velho -> 0x67 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
-mov [novo + imm32], velho -> 0x67 , 0x41 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
-mov [velho + imm32], novo -> 0x67 , 0x44 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
-mov [novo + imm32], novo -> 0x67 , 0x45 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov [velho + imm32], velho -> 0x67 , 0x89 , 0x80 + indice_dst + (indice_src << 3)        , imm32
+mov [novo + imm32],  velho -> 0x67 , 0x41 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov [velho + imm32], novo  -> 0x67 , 0x44 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
+mov [novo + imm32],  novo  -> 0x67 , 0x45 , 0x89 , 0x80 + indice_dst + (indice_src << 3) , imm32
 
 cmp rx, ry:
 cmp velho, velho -> 0x39 , 0xc0 + indice_dst + (indice_src << 3)
-cmp novo, velho -> 0x41 , 0x39 , 0xc0 + indice_dst + (indice_src << 3)
-cmp velho, novo -> 0x44 , 0x39 , 0xc0 + indice_dst + (indice_src << 3)
-cmp novo, novo -> 0x45 , 0x39 , 0xc0 + indice_dst + (indice_src << 3)
+cmp novo, velho  -> 0x41 , 0x39 , 0xc0 + indice_dst + (indice_src << 3)
+cmp velho, novo  -> 0x44 , 0x39 , 0xc0 + indice_dst + (indice_src << 3)
+cmp novo, novo   -> 0x45 , 0x39 , 0xc0 + indice_dst + (indice_src << 3)
 
 jmp:
 jmp imm32 -> 0xE9 , imm32 - 0x05
@@ -63,9 +63,9 @@ je 0xFFFF -> 0f 84 f9 ff 00 00
 
 add:
 add velho, velho -> 0x01C0   + indice_dst + (indice_src * 0x08)
-add novo, velho  -> 0x4101C0 + indice_dst + (indice_src * 0x08)
+add novo,  velho -> 0x4101C0 + indice_dst + (indice_src * 0x08)
 add velho, novo  -> 0x4401C0 + indice_dst + (indice_src * 0x08)
-add novo, novo   -> 0x4501C0 + indice_dst + (indice_src * 0x08)
+add novo,  novo  -> 0x4501C0 + indice_dst + (indice_src * 0x08)
 
 0:  01 c0                   add    eax,eax
 2:  01 c8                   add    eax,ecx
@@ -84,9 +84,9 @@ c:  45 01 d0                add    r8d,r10d
 
 sub:
 sub velho, velho -> 0x29C0   + indice_dst + (indice_src * 0x08)
-sub novo, velho  -> 0x4129C0 + indice_dst + (indice_src * 0x08)
+sub novo,  velho -> 0x4129C0 + indice_dst + (indice_src * 0x08)
 sub velho, novo  -> 0x4429C0 + indice_dst + (indice_src * 0x08)
-sub novo, novo   -> 0x4529C0 + indice_dst + (indice_src * 0x08)
+sub novo,  novo  -> 0x4529C0 + indice_dst + (indice_src * 0x08)
 
 0:  29 c0                   sub    eax,eax
 2:  29 c8                   sub    eax,ecx
@@ -105,9 +105,9 @@ f:  44 29 c0                sub    eax,r8d
 
 and:
 and velho, velho -> 0x21C0   + indice_dst + (indice_src * 0x08)
-and novo, velho  -> 0x4121C0 + indice_dst + (indice_src * 0x08)
+and novo,  velho -> 0x4121C0 + indice_dst + (indice_src * 0x08)
 and velho, novo  -> 0x4421C0 + indice_dst + (indice_src * 0x08)
-and novo, novo   -> 0x4521C0 + indice_dst + (indice_src * 0x08)
+and novo,  novo  -> 0x4521C0 + indice_dst + (indice_src * 0x08)
 
 0:  21 c0                   and    eax,eax
 2:  21 c8                   and    eax,ecx
@@ -117,7 +117,7 @@ and novo, novo   -> 0x4521C0 + indice_dst + (indice_src * 0x08)
 c:  41 21 d0                and    r8d,edx
 f:  44 21 c0                and    eax,r8d
 12: 44 21 c8                and    eax,r9d
-15: 44 21 d0                an09   eax,r10d
+15: 44 21 d0                and    eax,r10d
 18: 45 21 c0                and    r8d,r8d
 1b: 45 21 c8                and    r8d,r9d
 1e: 45 21 d0                and    r8d,r10d 
@@ -126,9 +126,9 @@ f:  44 21 c0                and    eax,r8d
 
 or:
 or velho, velho -> 0x09C0   + indice_dst + (indice_src * 0x08)
-or novo, velho  -> 0x4109C0 + indice_dst + (indice_src * 0x08)
+or novo,  velho -> 0x4109C0 + indice_dst + (indice_src * 0x08)
 or velho, novo  -> 0x4409C0 + indice_dst + (indice_src * 0x08)
-or novo, novo   -> 0x4509C0 + indice_dst + (indice_src * 0x08)
+or novo,  novo  -> 0x4509C0 + indice_dst + (indice_src * 0x08)
 
 0:  09 c0                   or     eax,eax
 2:  09 c8                   or     eax,ecx
